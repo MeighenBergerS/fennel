@@ -1,0 +1,19 @@
+# -----------------------------------------------------------------------------------------------------
+# Requirements
+# -----------------------------------------------------------------------------------------------------
+# Basic installation
+# optional: it is recommended to install fennel into a virtual python environment
+# optional: for ease of use we suggest using conda
+conda create -name fennel
+conda activate fennel
+
+# install requirements
+conda install --file requirements.txt
+
+# Note that if using pip, please make sure the jupyter kernel is set correctly.
+# Otherwise the steps should be similar
+
+# -----------------------------------------------------------------------------------------------------
+# Optional
+# -----------------------------------------------------------------------------------------------------
+# The beta aspects require some additional packages

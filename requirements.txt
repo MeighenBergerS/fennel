@@ -1,0 +1,9 @@
+jupyter
+pandas
+pyyaml
+nbstripout
+matplotlib
+numpy
+scipy
+tqdm
+flake8
