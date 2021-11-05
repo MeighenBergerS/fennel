@@ -16,6 +16,8 @@ import yaml
 # Package modules
 from .config import config
 from .particle import Particle
+from .tracks import Track
+from .em_cascades import EM_Cascade
 
 # unless we put this class in __init__, __name__ will be contagion.contagion
 _log = logging.getLogger("fennel")
@@ -101,6 +103,18 @@ class Fennel(object):
         _log.info('Creating a particle...')
         # Life creation
         self._particle = Particle()
+        _log.info('Creation finished')
+        _log.info('---------------------------------------------------')
+        _log.info('---------------------------------------------------')
+        _log.info('Creating a track...')
+        # Life creation
+        self._track = Track()
+        _log.info('Creation finished')
+        _log.info('---------------------------------------------------')
+        _log.info('---------------------------------------------------')
+        _log.info('Creating an em cascade...')
+        # Life creation
+        self._em_cascade = EM_Cascade()
         _log.info('Creation finished')
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')

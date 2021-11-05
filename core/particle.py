@@ -24,12 +24,13 @@ class Particle(object):
     Raises
     ------
     """
-    def __init__(self):
+    def __init__(self, pdg_id: int):
         """Constructs the particle.
 
         Parameters
         ----------
-        None
+        pdg_id : int
+            The pdg number of the particle
 
         Returns
         -------
@@ -38,4 +39,32 @@ class Particle(object):
         Raises
         ------
         """
-        _log.debug('Constructing particle')
+        _log.debug('Constructing a particle')
+        self._pdg_id = pdg_id
+        # Naming conventions PDG Monte Carlo scheme
+        if pdg_id > 0:
+            self._name = config["pdg id"][pdg_id]
+            if self._name == "gamma":
+                self._name = self._name
+            elif self._name == "n":
+                self._name = self._name
+            elif self._name == "KL0":
+                self._name = self._name
+            elif self._name[:2] == "nu":
+                self._name = self._name
+            elif pdg_id > 100:
+                self._name = self._name + "+"
+            else:
+                self._name = self._name + "-"
+        else:
+            self._name = config["pdg id"][pdg_id]
+            if self._name[:2] == "nu":
+                self._name = "anti_" + self._name
+            elif pdg_id < -100:
+                self._name = self._name + "-"
+            else:
+                self._name = self._name + "+"
+        _log.debug("The particles name is " + self._name)
+        self._energies = config["advanced"]["energy grid"]
+        self._mass = config[self._name]["mass"]
+        self._std_track = config[self._name]["standard track length"]
