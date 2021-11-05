@@ -54,13 +54,11 @@ class Hadron_Cascade(object):
             ValueError("Distribution type not implemented!")
 
     def track_lengths(
-            self, E: np.array, particle: Particle):
+            self, particle: Particle):
         """ Parametrization for the energy dependence of the tracks
 
         Parameters
         ----------
-        E : np.array
-            The energies of interest in GeV
         particle : Particle
             The particle of interest
 
@@ -71,6 +69,7 @@ class Hadron_Cascade(object):
         track_length_dev : np.array
             The track lengths deviations for different energies
         """
+        E = particle._energies
         params = config["em cascade"]["track parameters"][particle._name]
         alpha = params["alpha"]
         beta = params["beta"]
@@ -79,6 +78,32 @@ class Hadron_Cascade(object):
         track_length = alpha * E**beta
         track_length_dev = alpha_dev * E**beta_dev
         return track_length, track_length_dev
+
+    def em_fraction(self, particle: Particle):
+        """ Parametrization of the EM contribution in a hadronic shower
+
+        Parameters
+        ----------
+        particle : Particle
+            The particle of interest
+
+        Returns
+        -------
+        em_fraction : np.array
+            The fraction for the given energies
+        em_fraction_sd : np.array
+            The standard deviation
+        """
+        E = particle._energies  # This is the initial energy of the cascade
+        params = config["hadron cascade"]["em fraction"][particle._name]
+        Es = params["Es"]
+        f0 = params["f0"]
+        m = params["m"]
+        sigma0 = params["sigma0"]
+        gamma = params["gamma"]
+        em_fraction = 1. - (1. - f0)*(E / Es)**(-m)
+        em_fraction_sd = sigma0 * np.log(E)**(-gamma)
+        return em_fraction, em_fraction_sd
 
     def _log_profile_func(
             self, z: np.array, particle: Particle,
@@ -98,12 +123,11 @@ class Hadron_Cascade(object):
             Is equal to l^(-1) * dl/dt. The result will be 2 dimensional, with
             cm defined along the first axis and energies along the second
         """
-        t = z / Lrad
+        t = z / self._Lrad
         res = np.array([
-            t_val * self._b_energy(particle) * 
+            t_val * self._b_energy(particle) *
             gamma.pdf(t_val * self._b_energy(particle),
-                      self._a_energy(particle)
-            )
+                      self._a_energy(particle))
             for t_val in t
         ])
         return res
@@ -127,7 +151,7 @@ class Hadron_Cascade(object):
             particle._name]
         alpha = params["alpha"]
         beta = params["beta"]
-        a = alpha + beta * np.log(E)
+        a = alpha + beta * np.log10(E)
         return a
 
     def _b_energy(self, particle: Particle) -> np.array:
@@ -155,7 +179,6 @@ class Hadron_Cascade(object):
             phi: np.array, n: float,
             particle: Particle) -> np.array:
         # TODO: Add asymmetry function
-        # TODO: Add changes with shower depth
         """ Calculates the symmetric angular distribution of the Cherenkov
         emission. The error should lie below 10%
 
@@ -171,14 +194,49 @@ class Hadron_Cascade(object):
         Returns
         -------
         distro : np.array
-            The distribution of emitted photons given the angle
+            The distribution of emitted photons given the angle. The
+            result is a 2d array with the first axis for the angles and
+            the second for the energies.
         """
-        params = config["em cascade"]["angular distribution"][particle._name]
-        a = params["a"]
-        b = params["b"]
-        c = params["c"]
-        d = params["d"]
-        distro = (a * np.exp(b * np.abs(
-            1. / n - np.cos(np.deg2rad(phi)))**c
-        ) + d)
+        a, b, c, d = self._energy_dependence_angle_pars(particle)
+        distro = np.array([
+            (a * np.exp(b * np.abs(
+                1. / n - np.cos(np.deg2rad(phi_val)))**c
+            ) + d)
+            for phi_val in phi
+        ])
+
         return distro
+
+    def _energy_dependence_angle_pars(
+            self, particle: Particle):
+        """ Parametrizes the energy dependence of the angular distribution
+        parameters
+
+        Parameters
+        ----------
+        particle : Particle
+            The particle of interest
+
+        Returns
+        -------
+        a : np.array
+            The first parameter values for the given energies
+        b : np.array
+            The second parameter values for the given energies
+        c : np.array
+            The third parameter values for the given energies
+        d : np.array
+            The fourth parameter values for the given energies
+        """
+        E = particle._energies
+        params = config["em cascade"]["angular distribution"][particle._name]
+        a_pars = params["a pars"]
+        b_pars = params["b pars"]
+        c_pars = params["c pars"]
+        d_pars = params["d pars"]
+        a = a_pars[0] * (np.log(E))**a_pars[1]
+        b = b_pars[0] * (np.log(E))**b_pars[1]
+        c = c_pars[0] * (np.log(E))**c_pars[1]
+        d = d_pars[0] * (np.log(E))**d_pars[1]
+        return a, b, c, d

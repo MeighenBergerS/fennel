@@ -54,13 +54,11 @@ class EM_Cascade(object):
             ValueError("Distribution type not implemented!")
 
     def track_lengths(
-            self, E: np.array, particle: Particle):
+            self, particle: Particle):
         """ Parametrization for the energy dependence of the tracks
 
         Parameters
         ----------
-        E : np.array
-            The energies of interest in GeV
         particle : Particle
             The particle of interest
 
@@ -71,6 +69,7 @@ class EM_Cascade(object):
         track_length_dev : np.array
             The track lengths deviations for different energies
         """
+        E = particle._energies
         params = config["em cascade"]["track parameters"][particle._name]
         alpha = params["alpha"]
         beta = params["beta"]
@@ -102,8 +101,7 @@ class EM_Cascade(object):
         res = np.array([
             t_val * self._b_energy(particle) *
             gamma.pdf(t_val * self._b_energy(particle),
-                      self._a_energy(particle)
-            )
+                      self._a_energy(particle))
             for t_val in t
         ])
         return res
@@ -127,7 +125,7 @@ class EM_Cascade(object):
             particle._name]
         alpha = params["alpha"]
         beta = params["beta"]
-        a = alpha + beta * np.log(E)
+        a = alpha + beta * np.log10(E)
         return a
 
     def _b_energy(self, particle: Particle) -> np.array:

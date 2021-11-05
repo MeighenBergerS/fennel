@@ -52,11 +52,39 @@ class Track(object):
             ValueError("Distribution type not implemented!")
 
     def additional_track_ratio(
+            self, particle: Particle, interaction: str) -> np.array:
+        """ Calculates the ratio between the additional track length
+        and the original
+
+        Parameters
+        ----------
+        particle : Particle
+            The particle for which this calculation should be performed
+        interaction : str
+            Name of the interaction
+
+        Returns
+        -------
+        ratio : np.array
+            The resulting ratio
+        """
+        E = particle._energies
+        params = config["track"]["additional track " + self._medium][
+            interaction
+        ]
+        lambd = params["lambda"]
+        kappa = params["kappa"]
+        ratio = (
+            lambd + kappa * np.log(E)
+        )
+        return ratio
+
+    def _additional_track_ratio_v1(
             self, particle: Particle,
             lambd: np.array, kappa: np.array, n: float,
             scaling=True) -> np.array:
         """ Calculates the ratio between the additional track length
-        and the original
+        and the original. This uses the explicit frank-tamm scaling
 
         Parameters
         ----------

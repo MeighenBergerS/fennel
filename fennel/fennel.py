@@ -18,6 +18,7 @@ from .config import config
 from .particle import Particle
 from .tracks import Track
 from .em_cascades import EM_Cascade
+from .hadron_cascades import Hadron_Cascade
 
 # unless we put this class in __init__, __name__ will be contagion.contagion
 _log = logging.getLogger("fennel")
@@ -33,7 +34,7 @@ class Fennel(object):
     ----------
     config : dic
         Configuration dictionary for the simulation
-    
+
     Returns
     -------
     None
@@ -47,7 +48,7 @@ class Fennel(object):
         ----------
         config : dic
             Configuration dictionary for the simulation
-        
+
         Returns
         -------
         None
@@ -100,21 +101,29 @@ class Fennel(object):
         _log.info('This package will help you model light yields')
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
-        _log.info('Creating a particle...')
-        # Life creation
-        self._particle = Particle()
+        _log.info('Creating particles...')
+        self._particles = {}
+        for particle_id in config["pdg id"].keys():
+            # Particle creation
+            self._particles[particle_id] = Particle(particle_id)
         _log.info('Creation finished')
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
         _log.info('Creating a track...')
-        # Life creation
+        # Track creation
         self._track = Track()
         _log.info('Creation finished')
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
         _log.info('Creating an em cascade...')
-        # Life creation
+        # EM cascade creation
         self._em_cascade = EM_Cascade()
+        _log.info('Creation finished')
+        _log.info('---------------------------------------------------')
+        _log.info('---------------------------------------------------')
+        _log.info('Creating an em cascade...')
+        # Hadron cascade creation
+        self._hadron_cascade = Hadron_Cascade()
         _log.info('Creation finished')
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
