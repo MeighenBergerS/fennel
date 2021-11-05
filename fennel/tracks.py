@@ -180,7 +180,7 @@ class Track(object):
         sin_angle = 1. - (1. / (beta * n))**2.
         return sin_angle
 
-    def _e2beta(E: np.array, mass: float) -> np.array:
+    def _e2beta(self, E: np.array, mass: float) -> np.array:
         """ Calculates the particle velocity in units of 1/c from energy
 
         Parameters
@@ -201,7 +201,8 @@ class Track(object):
     def _symmetric_angle_distro(
             self,
             phi: np.array, n: float,
-            a: float, b: float, c: float) -> np.array:
+            particle: Particle) -> np.array:
+        # TODO: Add asymmetry function
         """ Calculates the symmetric angular distribution of the Cherenkov
         emission. The error should lie below 10%
 
@@ -211,19 +212,51 @@ class Track(object):
             The angles of interest in degrees
         n : float
             The refractive index
-        a : float
-            Fitted parameter
-        b : float
-            Fitted parameter
-        c : float
-            Fitted parameter
+        particle : Particle
+            The particle of interest
 
         Returns
         -------
         distro : np.array
-            The distribution of emitted photons given the angle
+            The distribution of emitted photons given the angle. The
+            result is a 2d array with the first axis for the angles and
+            the second for the energies.
         """
-        distro = a * np.exp(b * np.abs(
-            1. / n - np.cos(np.deg2rad(phi)))**c
-        )
+        a, b, c = self._energy_dependence_angle_pars(particle)
+        distro = np.array([
+            (a * np.exp(b * np.abs(
+                1. / n - np.cos(np.deg2rad(phi_val)))**c
+            ))
+            for phi_val in phi
+        ])
+
         return distro
+
+    def _energy_dependence_angle_pars(
+            self, particle: Particle):
+        """ Parametrizes the energy dependence of the angular distribution
+        parameters
+
+        Parameters
+        ----------
+        particle : Particle
+            The particle of interest
+
+        Returns
+        -------
+        a : np.array
+            The first parameter values for the given energies
+        b : np.array
+            The second parameter values for the given energies
+        c : np.array
+            The third parameter values for the given energies
+        """
+        E = particle._energies
+        params = config["track"]["angular distribution"]
+        a_pars = params["a pars"]
+        b_pars = params["b pars"]
+        c_pars = params["c pars"]
+        a = a_pars[0] * (np.log(E)) * a_pars[1]
+        b = b_pars[0] * (np.log(E)) * b_pars[1]
+        c = c_pars[0] * (np.log(E)) * c_pars[1]
+        return a, b, c

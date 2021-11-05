@@ -70,7 +70,7 @@ class Hadron_Cascade(object):
             The track lengths deviations for different energies
         """
         E = particle._energies
-        params = config["em cascade"]["track parameters"][particle._name]
+        params = config["hadron cascade"]["track parameters"][particle._name]
         alpha = params["alpha"]
         beta = params["beta"]
         alpha_dev = params["alpha dev"]
@@ -147,7 +147,7 @@ class Hadron_Cascade(object):
             The values for the energies of interest
         """
         E = particle._energies
-        params = config["em cascade"]["longitudinal parameters"][
+        params = config["hadron cascade"]["longitudinal parameters"][
             particle._name]
         alpha = params["alpha"]
         beta = params["beta"]
@@ -169,7 +169,7 @@ class Hadron_Cascade(object):
             The values for the energies of interest
         """
         E = particle._energies
-        params = config["em cascade"]["longitudinal parameters"][
+        params = config["hadron cascade"]["longitudinal parameters"][
             particle._name]
         b = params["b"]
         return b * np.ones(len(E))
@@ -206,7 +206,7 @@ class Hadron_Cascade(object):
             for phi_val in phi
         ])
 
-        return distro
+        return np.nan_to_num(distro)
 
     def _energy_dependence_angle_pars(
             self, particle: Particle):
@@ -230,7 +230,7 @@ class Hadron_Cascade(object):
             The fourth parameter values for the given energies
         """
         E = particle._energies
-        params = config["em cascade"]["angular distribution"][particle._name]
+        params = config["hadron cascade"]["angular distribution"][particle._name]
         a_pars = params["a pars"]
         b_pars = params["b pars"]
         c_pars = params["c pars"]
