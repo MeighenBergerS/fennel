@@ -49,16 +49,24 @@ _baseconfig = {
     # PDG ID Lib
     ###########################################################################
     "pdg id": {
-        11: "e",
+        11: "e-",
+        -11: "e+",
         12: "nue",
-        13: "mu",
+        -12: "anti_nue",
+        13: "mu-",
+        -13: "mu+",
         14: "numu",
-        15: "tau",
+        -14: "anti_numu",
+        15: "tau-",
+        -15: "tau+",
         16: "nutau",
+        -16: "anti_nutau",
         22: "gamma",
-        211: "pi",
+        211: "pi+",
+        -211: "pi-",
         130: "KL0",
-        2212: "p",
+        2212: "p+",
+        -2212: "p-",
         2112: "n",
     },
     ###########################################################################
@@ -75,6 +83,17 @@ _baseconfig = {
            "density": 0.9180,  # in g/cm^-3,
            "radiation length": 36.08,  # g cm^-2
        },
+    },
+    ###########################################################################
+    # Simulation aspects
+    ###########################################################################
+    "simulation": {
+        "track particles": [13, -13],
+        "track interactions": [
+            "ionization", "pair", "brems", "nuclear", "total"
+            ],
+        "em particles": [11, -11, 22],
+        "hadron particles": [211, -211, 130, 2212, -2212, 2112]
     },
     ###########################################################################
     # Track
@@ -358,7 +377,14 @@ _baseconfig = {
         # Energy threshold for continuous losses
         "threshold E": 0.5,  # In GeV
         "energy grid": np.logspace(0., 9, 91),
-        "Cherenkov distro": "symmetric"
+        "Cherenkov distro": "symmetric",
+        "fine structure": 0.0072973525693,
+        "particle charge": 1.,  # Charge of the particle of interest
+        "wavelengths": np.linspace(300., 600., 31),  # in nm
+        "track lengths": np.logspace(-3, 1, 41),  # in m
+        "angles": np.linspace(0., 180., 100),  # in degrees
+        # The grid used for long profiling. Given in cm
+        "z grid": np.linspace(0., 1e4, int(1e4)),
     },
 }
 

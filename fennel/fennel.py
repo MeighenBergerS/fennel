@@ -19,6 +19,7 @@ from .particle import Particle
 from .tracks import Track
 from .em_cascades import EM_Cascade
 from .hadron_cascades import Hadron_Cascade
+from .photons import Photon
 
 # unless we put this class in __init__, __name__ will be contagion.contagion
 _log = logging.getLogger("fennel")
@@ -121,9 +122,18 @@ class Fennel(object):
         _log.info('Creation finished')
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
-        _log.info('Creating an em cascade...')
+        _log.info('Creating a hadron cascade...')
         # Hadron cascade creation
         self._hadron_cascade = Hadron_Cascade()
+        _log.info('Creation finished')
+        _log.info('---------------------------------------------------')
+        _log.info('---------------------------------------------------')
+        _log.info('Creating a photon...')
+        # Hadron cascade creation
+        self._photon = Photon(
+            self._particles, self._track,
+            self._em_cascade, self._hadron_cascade
+        )
         _log.info('Creation finished')
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
@@ -145,6 +155,7 @@ class Fennel(object):
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
         # A new simulation
+        self._statistics = self._photon._sim()
         _log.debug(
             "Dumping run settings into %s",
             config["general"]["config location"],
@@ -158,7 +169,7 @@ class Fennel(object):
         _log.info('          /"*._         _')
         _log.info("      .-*'`    `*-.._.-'/")
         _log.info('    < * ))     ,       ( ')
-        _log.info('     `*-._`._(__.--*"`.\ ')
+        _log.info("     `*-._`._(__.--*.---. ")
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
         # Closing log
@@ -167,7 +178,6 @@ class Fennel(object):
     @property
     def statistics(self):
         """ Getter functions for the simulation results
-        from the simulation
 
         Parameters
         ----------
@@ -175,7 +185,87 @@ class Fennel(object):
 
         Returns
         -------
-        statistics : dic
+        statistics : pandas.DataFrame
             Stores the results from the simulation
         """
         return self._statistics
+
+    def track_yields(self, energy: float, deltaL: float, interaction='total'):
+        """ Fetcher function for a specific particle and energy. This is for
+        tracks and currently only for muons and symmetric distros
+
+        Parameters
+        ----------
+        energy : float
+            The energy of the particle
+        deltaL : float
+            The step size for the current track length in cm
+        interaction : str
+            Optional: The interaction(s) which should produce the light
+
+        Returns
+        -------
+        counts : float
+            The photon counts
+        angles : np.array
+            The angular distribution
+        """
+        return self._photon._track_fetcher(energy, deltaL, interaction)
+
+    def em_yields(
+            self, energy: float, particle: int,
+            mean=True):
+        """ Fetcher function for a specific particle and energy. This is for
+        em cascades and currently only symmetric distros
+
+        Parameters
+        ----------
+        energy : float
+            The energy of the particle
+        particle : int
+            The particle of interest with its pdg id
+        mean : bool
+            Optional: Switch to use either the mean value or a sample
+
+        Returns
+        -------
+        counts : float
+            The photon counts
+        long_profile : np.array
+            The distribution along the shower axis
+        angles : np.array
+            The angular distribution
+        """
+        return self._photon._em_cascade_fetcher(
+            energy, particle, mean
+        )
+
+    def hadron_yields(
+            self, energy, particle,
+            mean):
+        """ Fetcher function for a specific particle and energy. This is for
+        hadron cascades and currently only symmetric distros
+
+        Parameters
+        ----------
+        energy : float
+            The energy of the particle
+        particle : int
+            The particle of interest with its pdg id
+        mean : bool
+            Optional: Switch to use either the mean value or a sample
+
+        Returns
+        -------
+        counts : float
+            The photon counts
+        long_profile : np.array
+            The distribution along the shower axis
+        em_fraction : np.array
+            The amount of em in the shower
+        angles : np.array
+            The angular distribution
+        """
+        return self._photon._hadron_cascade_fetcher(
+            energy, particle, mean
+        )

@@ -79,6 +79,34 @@ class EM_Cascade(object):
         track_length_dev = alpha_dev * E**beta_dev
         return track_length, track_length_dev
 
+    def track_lengths_fetcher(
+            self, E: float, particle: Particle):
+        """ Parametrization for the energy dependence of the tracks. This is
+        the fetcher function for a single energy
+
+        Parameters
+        ----------
+        E : float
+            The energy of interest
+        particle : Particle
+            The particle of interest
+
+        Returns
+        -------
+        track_length : np.array
+            The track lengths for different energies
+        track_length_dev : np.array
+            The track lengths deviations for different energies
+        """
+        params = config["em cascade"]["track parameters"][particle._name]
+        alpha = params["alpha"]
+        beta = params["beta"]
+        alpha_dev = params["alpha dev"]
+        beta_dev = params["beta dev"]
+        track_length = alpha * E**beta
+        track_length_dev = alpha_dev * E**beta_dev
+        return track_length, track_length_dev
+
     def _log_profile_func(
             self, z: np.array, particle: Particle,
             ) -> np.array:
@@ -147,6 +175,79 @@ class EM_Cascade(object):
             particle._name]
         b = params["b"]
         return b * np.ones(len(E))
+
+    def _log_profile_func_fetcher(
+            self, E: float, z: np.array, particle: Particle,
+            ) -> np.array:
+        """ Parametrization of the longitudinal profile for a single energy.
+        This still needs work
+
+        Parameters
+        ----------
+        E : float
+            The energy in GeV
+        z : np.array
+            The cascade depth in cm
+        particle : Particle
+            The particle of interest
+
+        Returns
+        -------
+        res : np.array
+            Is equal to l^(-1) * dl/dt. The result will be 2 dimensional, with
+            cm defined along the first axis and energies along the second
+        """
+        t = z / self._Lrad
+        res = np.array([
+            t_val * self._b_energy_fetch(particle) *
+            gamma.pdf(t_val * self._b_energy_fetch(particle),
+                      self._a_energy_fetch(E, particle))
+            for t_val in t
+        ])
+        return res
+
+    def _a_energy_fetch(self, E: float, particle: Particle) -> np.array:
+        """ Parametrizes the energy dependence of the a parameter for the
+        longitudinal profiles. This is for a single energy.
+
+        Parameters
+        ----------
+        E : float
+            The energy in GeV
+        particle : Particle
+            The particle of interest
+
+        Returns
+        -------
+        a : np.array
+            The values for the energies of interest
+        """
+        params = config["em cascade"]["longitudinal parameters"][
+            particle._name]
+        alpha = params["alpha"]
+        beta = params["beta"]
+        a = alpha + beta * np.log10(E)
+        return a
+
+    def _b_energy_fetch(self, particle: Particle) -> np.array:
+        """ Parametrizes the energy dependence of the b parameter for the
+        longitudinal profiles. Currently assumed to be constant.
+        This is for a single energy.
+
+        Parameters
+        ----------
+        particle : Particle
+            The particle of interest
+
+        Returns
+        -------
+        b : np.array
+            The values for the energies of interest
+        """
+        params = config["em cascade"]["longitudinal parameters"][
+            particle._name]
+        b = params["b"]
+        return b
 
     def _symmetric_angle_distro(
             self,

@@ -31,8 +31,7 @@ class Track(object):
 
         Parameters
         ----------
-        particle : Particle
-            The particle for which the tracks should be generated
+        None
 
         Returns
         -------
@@ -69,6 +68,33 @@ class Track(object):
             The resulting ratio
         """
         E = particle._energies
+        params = config["track"]["additional track " + self._medium][
+            interaction
+        ]
+        lambd = params["lambda"]
+        kappa = params["kappa"]
+        ratio = (
+            lambd + kappa * np.log(E)
+        )
+        return ratio
+
+    def additional_track_ratio_fetcher(
+            self, E: float, interaction: str) -> np.array:
+        """ Calculates the ratio between the additional track length
+        and the original for a single energy
+
+        Parameters
+        ----------
+        E : float
+            The energy of the particle in GeV
+        interaction : str
+            Name of the interaction
+
+        Returns
+        -------
+        ratio : float
+            The resulting ratio
+        """
         params = config["track"]["additional track " + self._medium][
             interaction
         ]
@@ -222,7 +248,41 @@ class Track(object):
             result is a 2d array with the first axis for the angles and
             the second for the energies.
         """
-        a, b, c = self._energy_dependence_angle_pars(particle)
+        a, b, c = self._energy_dependence_angle_pars(particle._energies)
+        distro = np.array([
+            (a * np.exp(b * np.abs(
+                1. / n - np.cos(np.deg2rad(phi_val)))**c
+            ))
+            for phi_val in phi
+        ])
+
+        return distro
+
+    def _symmetric_angle_distro_fetcher(
+            self,
+            phi: np.array, n: float,
+            E: float) -> np.array:
+        # TODO: Add asymmetry function
+        """ Calculates the symmetric angular distribution of the Cherenkov
+        emission for a single energy. The error should lie below 10%
+
+        Parameters
+        ----------
+        phi : np.array
+            The angles of interest in degrees
+        n : float
+            The refractive index
+        E : float
+            The energy of interest
+
+        Returns
+        -------
+        distro : np.array
+            The distribution of emitted photons given the angle. The
+            result is a 2d array with the first axis for the angles and
+            the second for the energies.
+        """
+        a, b, c = self._energy_dependence_angle_pars(E)
         distro = np.array([
             (a * np.exp(b * np.abs(
                 1. / n - np.cos(np.deg2rad(phi_val)))**c
@@ -233,14 +293,14 @@ class Track(object):
         return distro
 
     def _energy_dependence_angle_pars(
-            self, particle: Particle):
+            self, E):
         """ Parametrizes the energy dependence of the angular distribution
         parameters
 
         Parameters
         ----------
-        particle : Particle
-            The particle of interest
+        E : float / np.array
+            The energies of interest
 
         Returns
         -------
@@ -251,7 +311,6 @@ class Track(object):
         c : np.array
             The third parameter values for the given energies
         """
-        E = particle._energies
         params = config["track"]["angular distribution"]
         a_pars = params["a pars"]
         b_pars = params["b pars"]
