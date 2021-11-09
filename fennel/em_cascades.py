@@ -6,6 +6,7 @@
 import logging
 import numpy as np
 from scipy.stats import gamma
+from scipy.special import gamma as gamma_func
 from .config import config
 from .particle import Particle
 
@@ -198,12 +199,18 @@ class EM_Cascade(object):
             cm defined along the first axis and energies along the second
         """
         t = z / self._Lrad
-        res = np.array([
-            t_val * self._b_energy_fetch(particle) *
-            gamma.pdf(t_val * self._b_energy_fetch(particle),
-                      self._a_energy_fetch(E, particle))
-            for t_val in t
-        ])
+        b = self._b_energy_fetch(particle)
+        a = self._a_energy_fetch(E, particle)
+        # res = np.array([
+        #     t_val * self._b_energy_fetch(particle) *
+        #     gamma.pdf(t_val * self._b_energy_fetch(particle),
+        #               self._a_energy_fetch(E, particle))
+        #     for t_val in t
+        # ])
+        # gamma.pdf seems far slower than the explicit implementation
+        res = t * b * (
+            (t * b)**(a - 1.) * np.exp(-(t*b)) / gamma_func(a)
+        )
         return res
 
     def _a_energy_fetch(self, E: float, particle: Particle) -> np.array:
