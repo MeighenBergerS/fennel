@@ -269,36 +269,18 @@ class Photon(object):
         angles : np.array
             The angular distribution
         """
-        start = time()
         tmp_track_frac = (
             self.__track.additional_track_ratio_fetcher(
                 energy, interaction
             )
         )
-        end = time()
-        _log.debug(
-            "The additional_track_ratio_fetcher took %.f seconds" % (
-                end - start)
-        )
         new_track = deltaL * (1. + tmp_track_frac)
-        start = time()
         counts = self._cherenkov_counts(self._wavelengths, [new_track])
-        end = time()
-        _log.debug(
-            "The _cherenkov_counts took %.f seconds" % (
-                end - start)
-        )
         # The angular distribution
-        start = time()
         angles = self.__track._symmetric_angle_distro_fetcher(
             self._angle_grid,
             self._n,
             energy)
-        end = time()
-        _log.debug(
-            "The _symmetric_angle_distro_fetcher took %.f seconds" % (
-                end - start)
-        )
         return counts.flatten(), angles
 
     def _em_cascade_fetcher(
@@ -325,19 +307,12 @@ class Photon(object):
         angles : np.array
             The angular distribution
         """
-        start = time()
         # The track length
         tmp_track, tmp_track_sd = (
             self.__em_cascade.track_lengths_fetcher(
                 energy, self.__particles[particle]
             )
         )
-        end = time()
-        _log.debug(
-            "The track_lengths_fetcher took %.f seconds" % (
-                end - start)
-        )
-        start = time()
         # Light yields
         if mean:
             counts = self._cherenkov_counts(self._wavelengths, [tmp_track])
@@ -346,32 +321,15 @@ class Photon(object):
             counts = self._cherenkov_counts(
                 self._wavelengths, [tmp_track_sample]
             )
-        end = time()
-        _log.debug(
-            "The _cherenkov_counts took %.f seconds" % (
-                end - start)
-        )
-        start = time()
         # Long profile
         long_profile = (
             self.__em_cascade._log_profile_func_fetcher(
                 energy, self._zgrid, self.__particles[particle]
             )
         )
-        end = time()
-        _log.debug(
-            "The _log_profile_func_fetcher took %.f seconds" % (
-                end - start)
-        )
-        start = time()
         # Angle distribution
         angles = self.__em_cascade.cherenkov_angle_distro(
             self._angle_grid, self._n, self.__particles[particle]
-        )
-        end = time()
-        _log.debug(
-            "The cherenkov_angle_distro took %.f seconds" % (
-                end - start)
         )
         return counts.flatten(), long_profile, angles
 
@@ -401,7 +359,6 @@ class Photon(object):
         angles : np.array
             The angular distribution
         """
-        start = time()
         # The track length
         tmp_track, tmp_track_sd = (
             self.__hadron_cascade.track_lengths_fetcher(
@@ -409,12 +366,6 @@ class Photon(object):
                 self.__particles[particle]
             )
         )
-        end = time()
-        _log.debug(
-            "The track_lengths_fetcher took %.f seconds" % (
-                end - start)
-        )
-        start = time()
         # Light yields
         if mean:
             counts = self._cherenkov_counts(self._wavelengths, [tmp_track])
@@ -423,12 +374,6 @@ class Photon(object):
             counts = self._cherenkov_counts(
                 self._wavelengths, [tmp_track_sample]
             )
-        end = time()
-        _log.debug(
-            "The _cherenkov_counts took %.f seconds" % (
-                end - start)
-        )
-        start = time()
         # EM Fraction
         tmp_fract, tmp_fract_sd = (
             self.__hadron_cascade.em_fraction_fetcher(
@@ -439,32 +384,15 @@ class Photon(object):
             em_fraction = tmp_fract
         else:
             em_fraction = self._rstate.normal(tmp_fract, tmp_fract_sd, 1)
-        end = time()
-        _log.debug(
-            "The em_fraction_fetcher took %.f seconds" % (
-                end - start)
-        )
-        start = time()
         # Long profile
         long_profile = (
             self.__hadron_cascade._log_profile_func_fetcher(
                 energy, self._zgrid, self.__particles[particle]
             )
         )
-        end = time()
-        _log.debug(
-            "The _log_profile_func_fetcher took %.f seconds" % (
-                end - start)
-        )
-        start = time()
         # Angle distribution
         angles = self.__hadron_cascade._symmetric_angle_distro_fetcher(
             energy, self._angle_grid, self._n, self.__particles[particle]
-        )
-        end = time()
-        _log.debug(
-            "The _symmetric_angle_distro_fetcher took %.f seconds" % (
-                end - start)
         )
         return counts.flatten(), long_profile, em_fraction, angles
 
