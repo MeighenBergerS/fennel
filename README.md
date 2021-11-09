@@ -16,8 +16,12 @@ Authors:
 
 ## Introduction <a name="introduction"></a>
 
+Welcome to Fennel!
+
+![Logo](images/Fennel.png)
+
 A python package to simulate the light production of particles.
-It calculates the light emissions from cascades and Cherenkov.
+It calculates the light emissions from cascades and tracks.
 
 ## Citation <a name="citation"></a>
 
