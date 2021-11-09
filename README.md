@@ -30,7 +30,7 @@ Please cite our work ....
 ## Documentation <a name="documentation"></a>
 
 The package provides automatically generated documentation under
-ADD SITE
+(https://meighenbergers.github.io/fennel/docs/index.html)
 
 ## Installation <a name="installation"></a>
 
