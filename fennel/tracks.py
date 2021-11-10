@@ -79,13 +79,13 @@ class Track(object):
         return ratio
 
     def additional_track_ratio_fetcher(
-            self, E: float, interaction: str) -> np.array:
+            self, E, interaction: str) -> np.array:
         """ Calculates the ratio between the additional track length
         and the original for a single energy
 
         Parameters
         ----------
-        E : float
+        E : float/np.array
             The energy of the particle in GeV
         interaction : str
             Name of the interaction
@@ -261,7 +261,7 @@ class Track(object):
     def _symmetric_angle_distro_fetcher(
             self,
             phi: np.array, n: float,
-            E: float) -> np.array:
+            E) -> np.array:
         # TODO: Add asymmetry function
         """ Calculates the symmetric angular distribution of the Cherenkov
         emission for a single energy. The error should lie below 10%
@@ -272,7 +272,7 @@ class Track(object):
             The angles of interest in degrees
         n : float
             The refractive index
-        E : float
+        E : float/np.array
             The energy of interest
 
         Returns

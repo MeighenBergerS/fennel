@@ -249,7 +249,8 @@ class Photon(object):
         return results
 
     def _track_fetcher(
-            self, energy: float, deltaL: float, interaction='total'):
+            self, energy: float, deltaL: float, interaction='total',
+            function=False):
         """ Fetcher function for a specific particle and energy. This is for
         tracks and currently only for muons and symmetric distros
 
@@ -261,6 +262,8 @@ class Photon(object):
             The step size for the current track length in cm
         interaction : str
             Optional: The interaction(s) which should produce the light
+        function : bool
+            returns the functional form instead of the evaluation
 
         Returns
         -------
@@ -269,73 +272,149 @@ class Photon(object):
         angles : np.array
             The angular distribution
         """
-        tmp_track_frac = (
-            self.__track.additional_track_ratio_fetcher(
-                energy, interaction
+        if function:
+            def counts(energy, wavelengths, interaction):
+                """ Fetcher function for a specific particle and energy. This is for
+                tracks and their photon counts
+
+                Parameters
+                ----------
+                energy : float/np.array
+                    The energy of the particle
+                wavelengths : np.array
+                    The wavelengths of interest
+                mean : bool
+                    Optional: Switch to use either the mean value or a sample
+
+                Returns
+                -------
+                counts : float/np.array
+                    The photon counts
+                """
+                tmp_track_frac = (
+                    self.__track.additional_track_ratio_fetcher(
+                        energy, interaction
+                    )
+                )
+                new_track = deltaL * (1. + tmp_track_frac)
+                new_track = np.array([new_track]).flatten()
+                return self._cherenkov_counts(wavelengths, new_track)
+            angles = self.__track._symmetric_angle_distro_fetcher
+        else:
+            tmp_track_frac = (
+                self.__track.additional_track_ratio_fetcher(
+                    energy, interaction
+                )
             )
-        )
-        new_track = deltaL * (1. + tmp_track_frac)
-        counts = self._cherenkov_counts(self._wavelengths, [new_track])
-        # The angular distribution
-        angles = self.__track._symmetric_angle_distro_fetcher(
-            self._angle_grid,
-            self._n,
-            energy)
-        return counts.flatten(), angles
+            new_track = deltaL * (1. + tmp_track_frac)
+            new_track = np.array([new_track]).flatten()
+            counts = self._cherenkov_counts(self._wavelengths, new_track)
+            # The angular distribution
+            angles = self.__track._symmetric_angle_distro_fetcher(
+                self._angle_grid,
+                self._n,
+                energy)
+        return counts, angles
 
     def _em_cascade_fetcher(
             self, energy: float, particle: int,
-            mean=True):
+            mean=True, function=False):
         """ Fetcher function for a specific particle and energy. This is for
         em cascades and currently only symmetric distros
 
         Parameters
         ----------
-        energy : float
+        energy : float/np.array
             The energy of the particle
         particle : int
             The particle of interest with its pdg id
         mean : bool
             Optional: Switch to use either the mean value or a sample
+        function : bool
+            Optional: Switches between the functional and explicit forms
 
         Returns
         -------
-        counts : float
+        counts : float/np.array
             The photon counts
         long_profile : np.array
             The distribution along the shower axis
         angles : np.array
             The angular distribution
         """
-        # The track length
-        tmp_track, tmp_track_sd = (
-            self.__em_cascade.track_lengths_fetcher(
-                energy, self.__particles[particle]
+        if function:
+            def counts(energy, wavelengths, particle, mean=True):
+                """ Fetcher function for a specific particle and energy. This is for
+                em cascades and their photon counts
+
+                Parameters
+                ----------
+                energy : float/np.array
+                    The energy of the particle
+                wavelengths : np.array
+                    The wavelengths of interest
+                particle : int
+                    The particle of interest with its pdg id
+                mean : bool
+                    Optional: Switch to use either the mean value or a sample
+
+                Returns
+                -------
+                counts : float/np.array
+                    The photon counts
+                """
+                tmp_track, tmp_track_sd = (
+                    self.__em_cascade.track_lengths_fetcher(
+                        energy, self.__particles[particle]
+                    )
+                )
+                if mean:
+                    tmp_track = np.array([tmp_track]).flatten()
+                    return self._cherenkov_counts(wavelengths, tmp_track)
+                else:
+                    tmp_track_sample = self._rstate.normal(
+                        tmp_track, tmp_track_sd
+                    )
+                    tmp_track_sample = np.array([tmp_track_sample]).flatten()
+                    return self._cherenkov_counts(
+                        wavelengths, tmp_track_sample
+                    )
+            long_profile = (
+                self.__em_cascade._log_profile_func_fetcher
             )
-        )
-        # Light yields
-        if mean:
-            counts = self._cherenkov_counts(self._wavelengths, [tmp_track])
+            angles = self.__em_cascade.cherenkov_angle_distro
         else:
-            tmp_track_sample = self._rstate.normal(tmp_track, tmp_track_sd, 1)
-            counts = self._cherenkov_counts(
-                self._wavelengths, [tmp_track_sample]
+            # The track length
+            tmp_track, tmp_track_sd = (
+                self.__em_cascade.track_lengths_fetcher(
+                    energy, self.__particles[particle]
+                )
             )
-        # Long profile
-        long_profile = (
-            self.__em_cascade._log_profile_func_fetcher(
-                energy, self._zgrid, self.__particles[particle]
+            # Light yields
+            if mean:
+                tmp_track = np.array([tmp_track]).flatten()
+                counts = self._cherenkov_counts(self._wavelengths, tmp_track)
+            else:
+                tmp_track_sample = self._rstate.normal(tmp_track, tmp_track_sd)
+                tmp_track_sample = np.array([tmp_track_sample]).flatten()
+                counts = self._cherenkov_counts(
+                    self._wavelengths, tmp_track_sample
+                )
+            # Long profile
+            long_profile = (
+                self.__em_cascade._log_profile_func_fetcher(
+                    energy, self._zgrid, self.__particles[particle]
+                )
             )
-        )
-        # Angle distribution
-        angles = self.__em_cascade.cherenkov_angle_distro(
-            self._angle_grid, self._n, self.__particles[particle]
-        )
-        return counts.flatten(), long_profile, angles
+            # Angle distribution
+            angles = self.__em_cascade.cherenkov_angle_distro(
+                self._angle_grid, self._n, self.__particles[particle]
+            )
+        return counts, long_profile, angles
 
     def _hadron_cascade_fetcher(
             self, energy: float, particle: int,
-            mean=True):
+            mean=True, function=False):
         """ Fetcher function for a specific particle and energy. This is for
         hadron cascades and currently only symmetric distros
 
@@ -347,6 +426,8 @@ class Photon(object):
             The particle of interest with its pdg id
         mean : bool
             Optional: Switch to use either the mean value or a sample
+        function : bool
+            Optional: Switches between the functional and explicit forms
 
         Returns
         -------
@@ -359,42 +440,117 @@ class Photon(object):
         angles : np.array
             The angular distribution
         """
-        # The track length
-        tmp_track, tmp_track_sd = (
-            self.__hadron_cascade.track_lengths_fetcher(
-                energy,
-                self.__particles[particle]
+        if function:
+            def counts(energy, wavelengths, particle, mean=True):
+                """ Fetcher function for a specific particle and energy. This is for
+                hadron cascades and their photon counts
+
+                Parameters
+                ----------
+                energy : float/np.array
+                    The energy of the particle
+                wavelengths : np.array
+                    The wavelengths of interest
+                particle : int
+                    The particle of interest with its pdg id
+                mean : bool
+                    Optional: Switch to use either the mean value or a sample
+
+                Returns
+                -------
+                counts : float/np.array
+                    The photon counts
+                """
+                tmp_track, tmp_track_sd = (
+                    self.__hadron_cascade.track_lengths_fetcher(
+                        energy,
+                        self.__particles[particle]
+                    )
+                )
+                # Light yields
+                if mean:
+                    tmp_track = np.array([tmp_track]).flatten()
+                    return self._cherenkov_counts(
+                        wavelengths, tmp_track
+                    )
+                else:
+                    tmp_track_sample = self._rstate.normal(
+                        tmp_track, tmp_track_sd
+                    )
+                    tmp_track_sample = np.array([tmp_track_sample]).flatten()
+                    return self._cherenkov_counts(
+                        wavelengths, tmp_track_sample
+                    )
+
+            def em_fraction(energy, particle, mean=True):
+                """ Fetcher function for a specific particle and energy. This is for
+                hadron cascades and their em fraction
+
+                Parameters
+                ----------
+                energy : float/np.array
+                    The energy of the particle
+                particle : int
+                    The particle of interest with its pdg id
+                mean : bool
+                    Optional: Switch to use either the mean value or a sample
+
+                Returns
+                -------
+                fraction : float/np.array
+                    The fraction
+                """
+                tmp_fract, tmp_fract_sd = (
+                    self.__hadron_cascade.em_fraction_fetcher(
+                        energy, self.__particles[particle]
+                    )
+                )
+                if mean:
+                    return tmp_fract
+                else:
+                    return self._rstate.normal(tmp_fract, tmp_fract_sd)
+            long_profile = (
+                self.__hadron_cascade._log_profile_func_fetcher
             )
-        )
-        # Light yields
-        if mean:
-            counts = self._cherenkov_counts(self._wavelengths, [tmp_track])
+            # Angle distribution
+            angles = self.__hadron_cascade._symmetric_angle_distro_fetcher
         else:
-            tmp_track_sample = self._rstate.normal(tmp_track, tmp_track_sd, 1)
-            counts = self._cherenkov_counts(
-                self._wavelengths, [tmp_track_sample]
+            # The track length
+            tmp_track, tmp_track_sd = (
+                self.__hadron_cascade.track_lengths_fetcher(
+                    energy,
+                    self.__particles[particle]
+                )
             )
-        # EM Fraction
-        tmp_fract, tmp_fract_sd = (
-            self.__hadron_cascade.em_fraction_fetcher(
-                energy, self.__particles[particle]
+            # Light yields
+            if mean:
+                counts = self._cherenkov_counts(self._wavelengths, [tmp_track])
+            else:
+                tmp_track_sample = self._rstate.normal(tmp_track, tmp_track_sd)
+                counts = self._cherenkov_counts(
+                    self._wavelengths, [tmp_track_sample]
+                )
+            # EM Fraction
+            tmp_fract, tmp_fract_sd = (
+                self.__hadron_cascade.em_fraction_fetcher(
+                    energy, self.__particles[particle]
+                )
             )
-        )
-        if mean:
-            em_fraction = tmp_fract
-        else:
-            em_fraction = self._rstate.normal(tmp_fract, tmp_fract_sd, 1)
-        # Long profile
-        long_profile = (
-            self.__hadron_cascade._log_profile_func_fetcher(
-                energy, self._zgrid, self.__particles[particle]
+            if mean:
+                em_fraction = tmp_fract
+            else:
+                em_fraction = self._rstate.normal(tmp_fract, tmp_fract_sd, 1)
+            # Long profile
+            long_profile = (
+                self.__hadron_cascade._log_profile_func_fetcher(
+                    energy, self._zgrid, self.__particles[particle]
+                )
             )
-        )
-        # Angle distribution
-        angles = self.__hadron_cascade._symmetric_angle_distro_fetcher(
-            energy, self._angle_grid, self._n, self.__particles[particle]
-        )
-        return counts.flatten(), long_profile, em_fraction, angles
+            # Angle distribution
+            angles = self.__hadron_cascade._symmetric_angle_distro_fetcher(
+                energy, self._angle_grid, self._n, self.__particles[particle]
+            )
+        return counts, long_profile, em_fraction, angles
 
     def _cherenkov_counts(
             self,

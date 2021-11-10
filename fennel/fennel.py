@@ -190,7 +190,10 @@ class Fennel(object):
         """
         return self._statistics
 
-    def track_yields(self, energy: float, deltaL: float, interaction='total'):
+    def track_yields(
+            self,
+            energy: float, deltaL: float, interaction='total',
+            function=False):
         """ Fetcher function for a specific particle and energy. This is for
         tracks and currently only for muons and symmetric distros
 
@@ -202,19 +205,23 @@ class Fennel(object):
             The step size for the current track length in cm
         interaction : str
             Optional: The interaction(s) which should produce the light
+        function : bool
+            returns the functional form instead of the evaluation
 
         Returns
         -------
-        counts : float
+        counts : float/function
             The photon counts
-        angles : np.array
+        angles : np.array/function
             The angular distribution
         """
-        return self._photon._track_fetcher(energy, deltaL, interaction)
+        return self._photon._track_fetcher(
+            energy, deltaL, interaction, function
+        )
 
     def em_yields(
             self, energy: float, particle: int,
-            mean=True):
+            mean=True, function=False):
         """ Fetcher function for a specific particle and energy. This is for
         em cascades and currently only symmetric distros
 
@@ -226,6 +233,8 @@ class Fennel(object):
             The particle of interest with its pdg id
         mean : bool
             Optional: Switch to use either the mean value or a sample
+        function : bool
+            Optional: Switches between the functional and explicit forms
 
         Returns
         -------
@@ -237,12 +246,12 @@ class Fennel(object):
             The angular distribution
         """
         return self._photon._em_cascade_fetcher(
-            energy, particle, mean
+            energy, particle, mean, function
         )
 
     def hadron_yields(
             self, energy, particle,
-            mean):
+            mean, function=False):
         """ Fetcher function for a specific particle and energy. This is for
         hadron cascades and currently only symmetric distros
 
@@ -254,6 +263,8 @@ class Fennel(object):
             The particle of interest with its pdg id
         mean : bool
             Optional: Switch to use either the mean value or a sample
+        function : bool
+            Optional: Switches between the functional and explicit forms
 
         Returns
         -------
@@ -267,5 +278,5 @@ class Fennel(object):
             The angular distribution
         """
         return self._photon._hadron_cascade_fetcher(
-            energy, particle, mean
+            energy, particle, mean, function
         )

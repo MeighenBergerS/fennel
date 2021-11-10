@@ -81,12 +81,12 @@ class Hadron_Cascade(object):
         return track_length, track_length_dev
 
     def track_lengths_fetcher(
-            self, E: float, particle: Particle):
+            self, E, particle: Particle):
         """ Parametrization for the energy dependence of the tracks
 
         Parameters
         ----------
-        E : float
+        E : float/np.array
             The energy of interest in GeV
         particle : Particle
             The particle of interest
@@ -133,12 +133,12 @@ class Hadron_Cascade(object):
         em_fraction_sd = sigma0 * np.log(E)**(-gamma)
         return em_fraction, em_fraction_sd
 
-    def em_fraction_fetcher(self, E: float, particle: Particle):
+    def em_fraction_fetcher(self, E, particle: Particle):
         """ Parametrization of the EM contribution in a hadronic shower
 
         Parameters
         ----------
-        E : float
+        E : float/np.array
             The energy of interest in GeV
         particle : Particle
             The particle of interest
@@ -230,13 +230,13 @@ class Hadron_Cascade(object):
         return b * np.ones(len(E))
 
     def _log_profile_func_fetcher(
-            self, E: float, z: np.array, particle: Particle,
+            self, E, z: np.array, particle: Particle,
             ) -> np.array:
         """ Parametrization of the longitudinal profile. This still needs work
 
         Parameters
         ----------
-        E : float
+        E : float/np.array
             The energy of interest in GeV
         z : np.array
             The cascade depth in cm
@@ -252,10 +252,13 @@ class Hadron_Cascade(object):
         t = z / self._Lrad
         b = self._b_energy_fetcher(particle)
         a = self._a_energy_fetcher(E, particle)
+        a = np.array([a]).flatten()
         # gamma.pdf seems far slower than the explicit implementation
-        res = t * b * (
-            (t * b)**(a - 1.) * np.exp(-(t*b)) / gamma_func(a)
-        )
+        res = np.array([
+            t * b * (
+                (t * b)**(a_val - 1.) * np.exp(-(t*b)) / gamma_func(a_val)
+            ) for a_val in a
+        ])
         return res
 
     def _a_energy_fetcher(self, E: float, particle: Particle) -> np.array:
@@ -338,7 +341,7 @@ class Hadron_Cascade(object):
         return np.nan_to_num(distro)
 
     def _symmetric_angle_distro_fetcher(
-            self, E: float,
+            self, E,
             phi: np.array, n: float,
             particle: Particle) -> np.array:
         # TODO: Add asymmetry function
@@ -347,7 +350,7 @@ class Hadron_Cascade(object):
 
         Parameters
         ----------
-        E : float
+        E : float/np.array
             The energy of interest in GeV
         phi : np.array
             The angles of interest in degrees
@@ -407,4 +410,7 @@ class Hadron_Cascade(object):
         b = b_pars[0] * (np.log(E))**b_pars[1]
         c = c_pars[0] * (np.log(E))**c_pars[1]
         d = d_pars[0] * (np.log(E))**d_pars[1]
-        return a, b, c, d
+        return (
+            np.array([a]).flatten(), np.array([b]).flatten(),
+            np.array([c]).flatten(), np.array([d]).flatten()
+        )

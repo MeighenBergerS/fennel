@@ -81,13 +81,13 @@ class EM_Cascade(object):
         return track_length, track_length_dev
 
     def track_lengths_fetcher(
-            self, E: float, particle: Particle):
+            self, E, particle: Particle):
         """ Parametrization for the energy dependence of the tracks. This is
         the fetcher function for a single energy
 
         Parameters
         ----------
-        E : float
+        E : float/np.array
             The energy of interest
         particle : Particle
             The particle of interest
@@ -178,14 +178,14 @@ class EM_Cascade(object):
         return b * np.ones(len(E))
 
     def _log_profile_func_fetcher(
-            self, E: float, z: np.array, particle: Particle,
+            self, E, z: np.array, particle: Particle,
             ) -> np.array:
         """ Parametrization of the longitudinal profile for a single energy.
         This still needs work
 
         Parameters
         ----------
-        E : float
+        E : float/np.array
             The energy in GeV
         z : np.array
             The cascade depth in cm
@@ -208,9 +208,12 @@ class EM_Cascade(object):
         #     for t_val in t
         # ])
         # gamma.pdf seems far slower than the explicit implementation
-        res = t * b * (
-            (t * b)**(a - 1.) * np.exp(-(t*b)) / gamma_func(a)
-        )
+        a = np.array(a).flatten()
+        res = np.array([
+            t * b * (
+                (t * b)**(a_val - 1.) * np.exp(-(t*b)) / gamma_func(a_val)
+            ) for a_val in a
+        ])
         return res
 
     def _a_energy_fetch(self, E: float, particle: Particle) -> np.array:
