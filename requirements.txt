@@ -1,5 +1,4 @@
 jupyter
-pandas
 pyyaml
 nbstripout
 matplotlib
