@@ -53,3 +53,5 @@ https://meighenbergers.github.io/fennel/docs/index.html
 To install please clone the repository or download the latest release. Then
 follow the instructions given in INSTALL.txt.
 Note this should install all necessary components.
+
+Or install using the setup.py
