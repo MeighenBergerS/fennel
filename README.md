@@ -41,7 +41,7 @@ and
 
 https://www.institut3b.physik.rwth-aachen.de/global/show_document.asp?id=aaaaaaaaaapwhjz
 
-Please cite our work .... when using this package.
+Please cite this page and their work when using this package.
 
 ## Documentation <a name="documentation"></a>
 
