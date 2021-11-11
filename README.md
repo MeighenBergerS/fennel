@@ -46,7 +46,7 @@ Please cite this page and their work when using this package.
 ## Documentation <a name="documentation"></a>
 
 The package provides automatically generated documentation under 
-https://meighenbergers.github.io/fennel/docs/index.html
+https://meighenbergers.github.io/fennel/
 
 ## Installation <a name="installation"></a>
 
