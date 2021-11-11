@@ -26,6 +26,7 @@ It calculates the light emissions from cascades and tracks.
 ## Citation <a name="citation"></a>
 
 This packages includes/uses distributions developed in
+
 Leif Rädel, Christopher Wiebusch,
 Calculation of the Cherenkov light yield from low energetic secondary particles accompanying high-energy muons in ice and water with Geant4 simulations,
 Astroparticle Physics,
