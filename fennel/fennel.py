@@ -72,28 +72,27 @@ class Fennel(object):
         config["runtime"] = {"random state": rstate}
 
         # Logger
-        # creating file handler with debug messages
-        fh = logging.FileHandler(
-            config["general"]["log file handler"], mode="w"
-        )
-        fh.setLevel(logging.DEBUG)
-        # console logger with a higher log level
-        ch = logging.StreamHandler(sys.stdout)
-        ch.setLevel(config["general"]["debug level"])
-
         # Logging formatter
         fmt = "%(levelname)s: %(message)s"
         fmt_with_name = "[%(name)s] " + fmt
         formatter_with_name = logging.Formatter(fmt=fmt_with_name)
-        fh.setFormatter(formatter_with_name)
+        # creating file handler with debug messages
+        if config["general"]["enable logging"]:
+            fh = logging.FileHandler(
+                config["general"]["log file handler"], mode="w"
+            )
+            fh.setLevel(logging.DEBUG)
+            fh.setFormatter(formatter_with_name)
+            _log.addHandler(fh)
+        # console logger with a higher log level
+        ch = logging.StreamHandler(sys.stdout)
+        ch.setLevel(config["general"]["debug level"])
         # add class name to ch only when debugging
         if config["general"]["debug level"] == logging.DEBUG:
             ch.setFormatter(formatter_with_name)
         else:
             formatter = logging.Formatter(fmt=fmt)
             ch.setFormatter(formatter)
-
-        _log.addHandler(fh)
         _log.addHandler(ch)
         _log.setLevel(logging.DEBUG)
         _log.info('---------------------------------------------------')
@@ -156,13 +155,14 @@ class Fennel(object):
         _log.info('---------------------------------------------------')
         # A new simulation
         self._statistics = self._photon._sim()
-        _log.debug(
-            "Dumping run settings into %s",
-            config["general"]["config location"],
-        )
-        with open(config["general"]["config location"], "w") as f:
-            yaml.dump(config, f)
-        _log.debug("Finished dump")
+        if config["general"]["enable logging"]:
+            _log.debug(
+                "Dumping run settings into %s",
+                config["general"]["config location"],
+            )
+            with open(config["general"]["config location"], "w") as f:
+                yaml.dump(config, f)
+            _log.debug("Finished dump")
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
         _log.info("Have a great day and until next time!")

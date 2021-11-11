@@ -17,8 +17,11 @@ _baseconfig = {
     "general": {
         # Random state seed
         "random state seed": 1337,
+        # Enable logger and config dump
+        "enable logging": False,
         # Output level
         'debug level': logging.ERROR,
+        # Note the paths need to be set appropiately for your system
         # Location of logging file handler
         "log file handler": "../run/fennel.log",
         # Dump experiment config to this location
