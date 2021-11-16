@@ -463,9 +463,7 @@ class Hadron_Cascade(object):
         energy_prim = np.array([Eprim]).flatten()
         # Converting to np.array for ease of use
         energy = np.array([Emu]).flatten()
-        alpha, beta, gamma = self._muon_production_pars(energy, particle)
-        # Removing too large values
-        energy[energy > (alpha / beta)**(-1. / gamma)] = 0.
+        alpha, beta, gamma = self._muon_production_pars(energy_prim, particle)
         # Removing too small values
         energy[energy <= 1.] = 0.
         # Removing all secondary energies above the primary energy(ies)
@@ -479,9 +477,13 @@ class Hadron_Cascade(object):
             energy_2d[id_arr][
                 energy_2d[id_arr] > energy_prim[id_arr]
             ] = 0.
+            # Removing too large values
+            energy[
+                energy > (alpha[id_arr] / beta[id_arr])**(-1. / gamma[id_arr])
+            ] = 0.
             distro.append(energy_prim[id_arr] * (
-                -alpha + beta * (
-                    energy_2d[id_arr]**(-gamma)
+                -alpha[id_arr] + beta[id_arr] * (
+                    energy_2d[id_arr]**(-gamma[id_arr])
                 )
             ))
         distro = np.array(distro)
