@@ -32,6 +32,7 @@ _baseconfig = {
     ###########################################################################
     "scenario": {
         "medium": "water",  # The background medium
+        "parametrization": "aachen"
     },
     ###########################################################################
     # Particle data

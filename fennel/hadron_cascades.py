@@ -7,6 +7,8 @@ import logging
 import numpy as np
 from scipy.stats import gamma
 from scipy.special import gamma as gamma_func
+from scipy.interpolate import UnivariateSpline
+import pickle
 from .config import config
 from .particle import Particle
 
@@ -53,6 +55,31 @@ class Hadron_Cascade(object):
             self.cherenkov_angle_distro = self._symmetric_angle_distro
         else:
             ValueError("Distribution type not implemented!")
+        if config["scenario"]["parametrization"] == "aachen":
+            _log.info("Loading the aachen parametrization")
+            self.__muon_prod_dict = pickle.load(
+                open("../data/aachen/muon_production.pkl", "rb")
+            )
+            _log.debug("Constructing spline dictionary")
+            self.__muon_prod_spl_pars = {}
+            for pdg_id in config["simulation"]["hadron particles"]:
+                self.__muon_prod_spl_pars[pdg_id] = {
+                    "alpha": UnivariateSpline(
+                        self.__muon_prod_dict[pdg_id][0],
+                        self.__muon_prod_dict[pdg_id][1],
+                        k=1, s=0, ext=3
+                    ),
+                    "beta": UnivariateSpline(
+                        self.__muon_prod_dict[pdg_id][0],
+                        self.__muon_prod_dict[pdg_id][2],
+                        k=1, s=0, ext=3
+                    ),
+                    "gamma": UnivariateSpline(
+                        self.__muon_prod_dict[pdg_id][0],
+                        self.__muon_prod_dict[pdg_id][3],
+                        k=1, s=0, ext=3
+                    )
+                }
 
     def track_lengths(
             self, particle: Particle):
@@ -414,3 +441,74 @@ class Hadron_Cascade(object):
             np.array([a]).flatten(), np.array([b]).flatten(),
             np.array([c]).flatten(), np.array([d]).flatten()
         )
+
+    def _muon_production_fetcher(self, Eprim, Emu, particle: Particle):
+        """ Parametrizes the production of muons in hadronic cascades
+
+        Parameters
+        ----------
+        Eprim : float/np.array
+            The energy(ies) of the primary particle
+        Emu : float/np.array
+            The energy(ies) of the muons
+        particle : Particle
+            The particle of interest
+
+        Returns
+        -------
+        distro: float/np.array
+            The distribution/value of the produced muons
+        """
+        # Converting the primary energy to an array
+        energy_prim = np.array([Eprim]).flatten()
+        # Converting to np.array for ease of use
+        energy = np.array([Emu]).flatten()
+        alpha, beta, gamma = self._muon_production_pars(energy, particle)
+        # Removing too large values
+        energy[energy > (alpha / beta)**(-1. / gamma)] = 0.
+        # Removing too small values
+        energy[energy <= 1.] = 0.
+        # Removing all secondary energies above the primary energy(ies)
+        energy_2d = np.array([
+            energy
+            for _ in range(len(energy_prim))
+        ])
+        # Removing energies above the primary
+        distro = []
+        for id_arr, _ in enumerate(energy_2d):
+            energy_2d[id_arr][
+                energy_2d[id_arr] > energy_prim[id_arr]
+            ] = 0.
+            distro.append(energy_prim[id_arr] * (
+                -alpha + beta * (
+                    energy_2d[id_arr]**(-gamma)
+                )
+            ))
+        distro = np.array(distro)
+        distro[distro == np.inf] = 0.
+        distro[distro < 0.] = 0.
+        return distro
+
+    def _muon_production_pars(self, E, particle: Particle):
+        """ Constructs the parametrization values for the energies of interest.
+
+        Parameters
+        ----------
+        E : float/np.array
+            The energy(ies) of interest
+        particle: Particle
+            The particle of interest
+
+        Returns
+        -------
+        alpha : float/np.array
+            The first parameter values for the given energies
+        beta : float/np.array
+            The second parameter values for the given energies
+        gamma : float/np.array
+            The third parameter values for the given energies
+        """
+        alpha = self.__muon_prod_spl_pars[particle._pdg_id]["alpha"](E)
+        beta = self.__muon_prod_spl_pars[particle._pdg_id]["beta"](E)
+        gamma = self.__muon_prod_spl_pars[particle._pdg_id]["gamma"](E)
+        return alpha, beta, gamma
