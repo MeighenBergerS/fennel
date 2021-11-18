@@ -384,7 +384,7 @@ _baseconfig = {
         "Cherenkov distro": "symmetric",
         "fine structure": 0.0072973525693,
         "particle charge": 1.,  # Charge of the particle of interest
-        "wavelengths": np.linspace(300., 600., 31),  # in nm
+        "wavelengths": np.linspace(350., 500., 100),  # in nm
         "track lengths": np.logspace(-3, 1, 41),  # in m
         "angles": np.linspace(0., 180., 100),  # in degrees
         # The grid used for long profiling. Given in cm

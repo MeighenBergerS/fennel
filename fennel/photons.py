@@ -126,7 +126,9 @@ class Photon(object):
                 )
                 # Calculating light yields
                 light_yields = np.array([
-                    self._cherenkov_counts(self._wavelengths, track_lengths)
+                    self._cherenkov_counts(
+                        self._wavelengths, track_lengths
+                    )
                     for track_lengths in total_lengths
                 ])
                 results[particle]["track"][interaction]['light yields'] = (
@@ -167,7 +169,9 @@ class Photon(object):
                 tmp_track_sd
             )
             # Light yields
-            light_yields = self._cherenkov_counts(self._wavelengths, tmp_track)
+            light_yields = self._cherenkov_counts(
+                self._wavelengths, tmp_track
+            )
             results[particle]["em cascade"]['mean light yields'] = (
                 light_yields
             )
@@ -224,7 +228,9 @@ class Photon(object):
                 tmp_fract_sd
             )
             # Light yields
-            light_yields = self._cherenkov_counts(self._wavelengths, tmp_track)
+            light_yields = self._cherenkov_counts(
+                self._wavelengths,
+                tmp_track)
             results[particle]["hadron cascade"]['mean light yields'] = (
                 light_yields
             )
@@ -249,16 +255,18 @@ class Photon(object):
         return results
 
     def _track_fetcher(
-            self, energy: float, deltaL: float, interaction='total',
+            self, energy, deltaL, interaction='total',
             function=False):
         """ Fetcher function for a specific particle and energy. This is for
-        tracks and currently only for muons and symmetric distros
+        tracks and currently only for muons and symmetric distros.
+        If energy and deltaL are arrays with length larger than 1, their
+        shapes must be the same.
 
         Parameters
         ----------
-        energy : float
-            The energy of the particle
-        deltaL : float
+        energy : float/np.array
+            The energy of the particle in GeV
+        deltaL : float/np.array
             The step size for the current track length in cm
         interaction : str
             Optional: The interaction(s) which should produce the light
@@ -267,10 +275,11 @@ class Photon(object):
 
         Returns
         -------
-        counts : float
-            The photon counts
+        differential_counts : np.array
+            dN/dlambda The differential photon counts per track length (in cm).
+            The shape of the array is (len(wavelengths), len(deltaL)).
         angles : np.array
-            The angular distribution
+            The angular distribution in degrees
         """
         if function:
             def counts(energy, wavelengths, interaction):
@@ -335,12 +344,13 @@ class Photon(object):
 
         Returns
         -------
-        counts : float/np.array
-            The photon counts
+        differential_counts : np.array
+            dN/dlambda The differential photon counts per track length (in cm).
+            The shape of the array is (len(wavelengths), len(deltaL)).
         long_profile : np.array
-            The distribution along the shower axis
+            The distribution along the shower axis for cm
         angles : np.array
-            The angular distribution
+            The angular distribution in degrees
         """
         if function:
             def counts(energy, wavelengths, particle, mean=True):
@@ -393,7 +403,8 @@ class Photon(object):
             # Light yields
             if mean:
                 tmp_track = np.array([tmp_track]).flatten()
-                counts = self._cherenkov_counts(self._wavelengths, tmp_track)
+                counts = self._cherenkov_counts(
+                    self._wavelengths, tmp_track)
             else:
                 tmp_track_sample = self._rstate.normal(tmp_track, tmp_track_sd)
                 tmp_track_sample = np.array([tmp_track_sample]).flatten()
@@ -431,19 +442,20 @@ class Photon(object):
 
         Returns
         -------
-        counts : float
-            The photon counts
+        differential_counts : np.array
+            dN/dlambda The differential photon counts per track length (in cm).
+            The shape of the array is (len(wavelengths), len(deltaL)).
         long_profile : np.array
-            The distribution along the shower axis
+            The distribution along the shower axis for cm
         em_fraction : np.array
             The amount of em in the shower
         angles : np.array
-            The angular distribution
+            The angular distribution in degrees
         """
         if function:
             def counts(energy, wavelengths, particle, mean=True):
-                """ Fetcher function for a specific particle and energy. This is for
-                hadron cascades and their photon counts
+                """ Fetcher function for a specific particle and energy.
+                This is for hadron cascades and their photon counts
 
                 Parameters
                 ----------
@@ -524,7 +536,9 @@ class Photon(object):
             )
             # Light yields
             if mean:
-                counts = self._cherenkov_counts(self._wavelengths, [tmp_track])
+                counts = self._cherenkov_counts(
+                    self._wavelengths, [tmp_track]
+                )
             else:
                 tmp_track_sample = self._rstate.normal(tmp_track, tmp_track_sd)
                 counts = self._cherenkov_counts(
@@ -555,15 +569,15 @@ class Photon(object):
     def _cherenkov_counts(
             self,
             wavelengths: np.array, track_lengths: np.array) -> np.array:
-        """ Calculates the number of photons for given wavelengths and
-        track-lengths assuming a constant velocity with beta=1.
+        """ Calculates the differential number of photons for the given
+        wavelengths and track-lengths assuming a constant velocity with beta=1.
 
         Parameters
         ----------
         wavelengths : np.array
             The wavelengths of interest
         track_lengths : np.array
-            The track lengths of interest
+            The track lengths of interest in cm
 
         Returns
         -------
@@ -576,8 +590,9 @@ class Photon(object):
             (1. - 1. / self._n**2.)
         )
         # 1e-7 due to the conversion from nm to cm
-        counts = np.array([[
-            prefac / (lambd * 1e-7)**2. * length for length in track_lengths]
+        diff_counts = np.array([[
+            prefac / (lambd * 1e-9)**2. * length * 1e-2
+            for length in track_lengths]
             for lambd in wavelengths
         ])
-        return counts
+        return diff_counts * 1e-9 / np.pi
