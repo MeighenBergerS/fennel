@@ -1,90 +1,590 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html class="writer-html5" lang="Python" >
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
-<title>fennel API documentation</title>
-<meta name="description" content="" />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
-<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fennel package &mdash; fennel v1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
-<body>
-<main>
-<article id="content">
-<header>
-<h1 class="title">Namespace <code>fennel</code></h1>
-</header>
-<section id="section-intro">
-</section>
-<section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
-<dl>
-<dt><code class="name"><a title="fennel.config" href="config.html">fennel.config</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="fennel.em_cascades" href="em_cascades.html">fennel.em_cascades</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="fennel.fennel" href="fennel.html">fennel.fennel</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="fennel.hadron_cascades" href="hadron_cascades.html">fennel.hadron_cascades</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="fennel.particle" href="particle.html">fennel.particle</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="fennel.photons" href="photons.html">fennel.photons</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="fennel.tracks" href="tracks.html">fennel.tracks</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
-</section>
-<section>
-</section>
-<section>
-</section>
-<section>
-</section>
-</article>
-<nav id="sidebar">
-<h1>Index</h1>
-<div class="toc">
-<ul></ul>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="#" class="icon icon-home"> fennel
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
-<ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
-<ul>
-<li><code><a title="fennel.config" href="config.html">fennel.config</a></code></li>
-<li><code><a title="fennel.em_cascades" href="em_cascades.html">fennel.em_cascades</a></code></li>
-<li><code><a title="fennel.fennel" href="fennel.html">fennel.fennel</a></code></li>
-<li><code><a title="fennel.hadron_cascades" href="hadron_cascades.html">fennel.hadron_cascades</a></code></li>
-<li><code><a title="fennel.particle" href="particle.html">fennel.particle</a></code></li>
-<li><code><a title="fennel.photons" href="photons.html">fennel.photons</a></code></li>
-<li><code><a title="fennel.tracks" href="tracks.html">fennel.tracks</a></code></li>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">fennel package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-fennel.config">fennel.config module</a></li>
+<li><a class="reference internal" href="#module-fennel.em_cascades">fennel.em_cascades module</a></li>
+<li><a class="reference internal" href="#module-fennel.fennel">fennel.fennel module</a></li>
+<li><a class="reference internal" href="#module-fennel.hadron_cascades">fennel.hadron_cascades module</a></li>
+<li><a class="reference internal" href="#module-fennel.particle">fennel.particle module</a></li>
+<li><a class="reference internal" href="#module-fennel.photons">fennel.photons module</a></li>
+<li><a class="reference internal" href="#module-fennel.tracks">fennel.tracks module</a></li>
+<li><a class="reference internal" href="#module-fennel">Module contents</a></li>
 </ul>
 </li>
 </ul>
-</nav>
-</main>
-<footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">fennel</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+      <li>fennel package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="fennel-package">
+<h1>fennel package<a class="headerlink" href="#fennel-package" title="Permalink to this headline"></a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</div>
+<div class="section" id="module-fennel.config">
+<span id="fennel-config-module"></span><h2>fennel.config module<a class="headerlink" href="#module-fennel.config" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fennel.config.ConfigClass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fennel.config.</span></span><span class="sig-name descname"><span class="pre">ConfigClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.config.ConfigClass" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>The configuration class. This is used
+by the package for all parameter settings. If something goes wrong
+its usually here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dic</em>) -- The config dictionary</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.config.ConfigClass.from_dict">
+<span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#fennel.config.ConfigClass.from_dict" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a config from dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>user_dict</strong> (<em>dic</em>) -- The user dictionary</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.config.ConfigClass.from_yaml">
+<span class="sig-name descname"><span class="pre">from_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#fennel.config.ConfigClass.from_yaml" title="Permalink to this definition"></a></dt>
+<dd><p>Update config with yaml file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>yaml_file</strong> (<em>str</em>) -- path to yaml file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fennel.em_cascades">
+<span id="fennel-em-cascades-module"></span><h2>fennel.em_cascades module<a class="headerlink" href="#module-fennel.em_cascades" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fennel.em_cascades.EM_Cascade">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fennel.em_cascades.</span></span><span class="sig-name descname"><span class="pre">EM_Cascade</span></span><a class="headerlink" href="#fennel.em_cascades.EM_Cascade" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Constructs the em cascade object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> -- </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.em_cascades.EM_Cascade.track_lengths">
+<span class="sig-name descname"><span class="pre">track_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><span class="pre">fennel.particle.Particle</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.em_cascades.EM_Cascade.track_lengths" title="Permalink to this definition"></a></dt>
+<dd><p>Parametrization for the energy dependence of the tracks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>particle</strong> (<a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><em>Particle</em></a>) -- The particle of interest</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>track_length</strong> (<em>np.array</em>) -- The track lengths for different energies</p></li>
+<li><p><strong>track_length_dev</strong> (<em>np.array</em>) -- The track lengths deviations for different energies</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.em_cascades.EM_Cascade.track_lengths_fetcher">
+<span class="sig-name descname"><span class="pre">track_lengths_fetcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><span class="pre">fennel.particle.Particle</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.em_cascades.EM_Cascade.track_lengths_fetcher" title="Permalink to this definition"></a></dt>
+<dd><p>Parametrization for the energy dependence of the tracks. This is
+the fetcher function for a single energy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>E</strong> (<em>float/np.array</em>) -- The energy of interest</p></li>
+<li><p><strong>particle</strong> (<a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><em>Particle</em></a>) -- The particle of interest</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>track_length</strong> (<em>np.array</em>) -- The track lengths for different energies</p></li>
+<li><p><strong>track_length_dev</strong> (<em>np.array</em>) -- The track lengths deviations for different energies</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fennel.fennel">
+<span id="fennel-fennel-module"></span><h2>fennel.fennel module<a class="headerlink" href="#module-fennel.fennel" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fennel.fennel.Fennel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fennel.fennel.</span></span><span class="sig-name descname"><span class="pre">Fennel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userconfig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.fennel.Fennel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>class: Fennel
+Interace to the fennel package. This class
+stores all methods required to run the simulation
+of the particle light yields
+:param config: Configuration dictionary for the simulation
+:type config: dic</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.fennel.Fennel.em_yields">
+<span class="sig-name descname"><span class="pre">em_yields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.fennel.Fennel.em_yields" title="Permalink to this definition"></a></dt>
+<dd><p>Fetcher function for a specific particle and energy. This is for
+em cascades and currently only symmetric distros</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energy</strong> (<em>float</em>) -- The energy of the particle</p></li>
+<li><p><strong>particle</strong> (<em>int</em>) -- The particle of interest with its pdg id</p></li>
+<li><p><strong>mean</strong> (<em>bool</em>) -- Optional: Switch to use either the mean value or a sample</p></li>
+<li><p><strong>function</strong> (<em>bool</em>) -- Optional: Switches between the functional and explicit forms</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>counts</strong> (<em>float</em>) -- The photon counts</p></li>
+<li><p><strong>long_profile</strong> (<em>np.array</em>) -- The distribution along the shower axis</p></li>
+<li><p><strong>angles</strong> (<em>np.array</em>) -- The angular distribution</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.fennel.Fennel.hadron_yields">
+<span class="sig-name descname"><span class="pre">hadron_yields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.fennel.Fennel.hadron_yields" title="Permalink to this definition"></a></dt>
+<dd><p>Fetcher function for a specific particle and energy. This is for
+hadron cascades and currently only symmetric distros</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energy</strong> (<em>float</em>) -- The energy of the particle</p></li>
+<li><p><strong>particle</strong> (<em>int</em>) -- The particle of interest with its pdg id</p></li>
+<li><p><strong>mean</strong> (<em>bool</em>) -- Optional: Switch to use either the mean value or a sample</p></li>
+<li><p><strong>function</strong> (<em>bool</em>) -- Optional: Switches between the functional and explicit forms</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>counts</strong> (<em>float</em>) -- The photon counts</p></li>
+<li><p><strong>long_profile</strong> (<em>np.array</em>) -- The distribution along the shower axis</p></li>
+<li><p><strong>em_fraction</strong> (<em>np.array</em>) -- The amount of em in the shower</p></li>
+<li><p><strong>angles</strong> (<em>np.array</em>) -- The angular distribution</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.fennel.Fennel.sim">
+<span class="sig-name descname"><span class="pre">sim</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fennel.fennel.Fennel.sim" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the light yields depending on input</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> -- </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="fennel.fennel.Fennel.statistics">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">statistics</span></span><a class="headerlink" href="#fennel.fennel.Fennel.statistics" title="Permalink to this definition"></a></dt>
+<dd><p>Getter functions for the simulation results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> -- </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>statistics</strong> -- Stores the results from the simulation</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.fennel.Fennel.track_yields">
+<span class="sig-name descname"><span class="pre">track_yields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltaL</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interaction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'total'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.fennel.Fennel.track_yields" title="Permalink to this definition"></a></dt>
+<dd><p>Fetcher function for a specific particle and energy. This is for
+tracks and currently only for muons and symmetric distros</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energy</strong> (<em>float</em>) -- The energy of the particle</p></li>
+<li><p><strong>deltaL</strong> (<em>float</em>) -- The step size for the current track length in cm</p></li>
+<li><p><strong>interaction</strong> (<em>str</em>) -- Optional: The interaction(s) which should produce the light</p></li>
+<li><p><strong>function</strong> (<em>bool</em>) -- returns the functional form instead of the evaluation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>counts</strong> (<em>float/function</em>) -- The photon counts</p></li>
+<li><p><strong>angles</strong> (<em>np.array/function</em>) -- The angular distribution</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fennel.hadron_cascades">
+<span id="fennel-hadron-cascades-module"></span><h2>fennel.hadron_cascades module<a class="headerlink" href="#module-fennel.hadron_cascades" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fennel.hadron_cascades.Hadron_Cascade">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fennel.hadron_cascades.</span></span><span class="sig-name descname"><span class="pre">Hadron_Cascade</span></span><a class="headerlink" href="#fennel.hadron_cascades.Hadron_Cascade" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Constructs the hadron cascade object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> -- </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.hadron_cascades.Hadron_Cascade.em_fraction">
+<span class="sig-name descname"><span class="pre">em_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><span class="pre">fennel.particle.Particle</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.hadron_cascades.Hadron_Cascade.em_fraction" title="Permalink to this definition"></a></dt>
+<dd><p>Parametrization of the EM contribution in a hadronic shower</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>particle</strong> (<a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><em>Particle</em></a>) -- The particle of interest</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>em_fraction</strong> (<em>np.array</em>) -- The fraction for the given energies</p></li>
+<li><p><strong>em_fraction_sd</strong> (<em>np.array</em>) -- The standard deviation</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.hadron_cascades.Hadron_Cascade.em_fraction_fetcher">
+<span class="sig-name descname"><span class="pre">em_fraction_fetcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><span class="pre">fennel.particle.Particle</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.hadron_cascades.Hadron_Cascade.em_fraction_fetcher" title="Permalink to this definition"></a></dt>
+<dd><p>Parametrization of the EM contribution in a hadronic shower</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>E</strong> (<em>float/np.array</em>) -- The energy of interest in GeV</p></li>
+<li><p><strong>particle</strong> (<a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><em>Particle</em></a>) -- The particle of interest</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>em_fraction</strong> (<em>np.array</em>) -- The fraction for the given energies</p></li>
+<li><p><strong>em_fraction_sd</strong> (<em>np.array</em>) -- The standard deviation</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.hadron_cascades.Hadron_Cascade.track_lengths">
+<span class="sig-name descname"><span class="pre">track_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><span class="pre">fennel.particle.Particle</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.hadron_cascades.Hadron_Cascade.track_lengths" title="Permalink to this definition"></a></dt>
+<dd><p>Parametrization for the energy dependence of the tracks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>particle</strong> (<a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><em>Particle</em></a>) -- The particle of interest</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>track_length</strong> (<em>np.array</em>) -- The track lengths for different energies</p></li>
+<li><p><strong>track_length_dev</strong> (<em>np.array</em>) -- The track lengths deviations for different energies</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.hadron_cascades.Hadron_Cascade.track_lengths_fetcher">
+<span class="sig-name descname"><span class="pre">track_lengths_fetcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">particle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><span class="pre">fennel.particle.Particle</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.hadron_cascades.Hadron_Cascade.track_lengths_fetcher" title="Permalink to this definition"></a></dt>
+<dd><p>Parametrization for the energy dependence of the tracks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>E</strong> (<em>float/np.array</em>) -- The energy of interest in GeV</p></li>
+<li><p><strong>particle</strong> (<a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><em>Particle</em></a>) -- The particle of interest</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>track_length</strong> (<em>np.array</em>) -- The track lengths for different energies</p></li>
+<li><p><strong>track_length_dev</strong> (<em>np.array</em>) -- The track lengths deviations for different energies</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fennel.particle">
+<span id="fennel-particle-module"></span><h2>fennel.particle module<a class="headerlink" href="#module-fennel.particle" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fennel.particle.Particle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fennel.particle.</span></span><span class="sig-name descname"><span class="pre">Particle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdg_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.particle.Particle" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Constructs the particle object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> -- </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-fennel.photons">
+<span id="fennel-photons-module"></span><h2>fennel.photons module<a class="headerlink" href="#module-fennel.photons" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fennel.photons.Photon">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fennel.photons.</span></span><span class="sig-name descname"><span class="pre">Photon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fennel.tracks.Track" title="fennel.tracks.Track"><span class="pre">fennel.tracks.Track</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">em_cascade</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fennel.em_cascades.EM_Cascade" title="fennel.em_cascades.EM_Cascade"><span class="pre">fennel.em_cascades.EM_Cascade</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">hadron_cascade</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fennel.hadron_cascades.Hadron_Cascade" title="fennel.hadron_cascades.Hadron_Cascade"><span class="pre">fennel.hadron_cascades.Hadron_Cascade</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.photons.Photon" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Constructs the Photon object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> -- </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-fennel.tracks">
+<span id="fennel-tracks-module"></span><h2>fennel.tracks module<a class="headerlink" href="#module-fennel.tracks" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fennel.tracks.Track">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fennel.tracks.</span></span><span class="sig-name descname"><span class="pre">Track</span></span><a class="headerlink" href="#fennel.tracks.Track" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Constructs the track object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> -- </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.tracks.Track.additional_track_ratio">
+<span class="sig-name descname"><span class="pre">additional_track_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><span class="pre">fennel.particle.Particle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">interaction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="headerlink" href="#fennel.tracks.Track.additional_track_ratio" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the ratio between the additional track length
+and the original</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>particle</strong> (<a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><em>Particle</em></a>) -- The particle for which this calculation should be performed</p></li>
+<li><p><strong>interaction</strong> (<em>str</em>) -- Name of the interaction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>ratio</strong> -- The resulting ratio</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.tracks.Track.additional_track_ratio_fetcher">
+<span class="sig-name descname"><span class="pre">additional_track_ratio_fetcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interaction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="headerlink" href="#fennel.tracks.Track.additional_track_ratio_fetcher" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the ratio between the additional track length
+and the original for a single energy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>E</strong> (<em>float/np.array</em>) -- The energy of the particle in GeV</p></li>
+<li><p><strong>interaction</strong> (<em>str</em>) -- Name of the interaction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>ratio</strong> -- The resulting ratio</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fennel.tracks.Track.additional_tracks">
+<span class="sig-name descname"><span class="pre">additional_tracks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><span class="pre">fennel.particle.Particle</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fennel.tracks.Track.additional_tracks" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the mean and deviation of the additional tracks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>particle</strong> (<a class="reference internal" href="#fennel.particle.Particle" title="fennel.particle.Particle"><em>Particle</em></a>) -- The particle of interest</p></li>
+<li><p><strong>tau</strong> (<em>np.array</em>) -- The fitted parameter</p></li>
+<li><p><strong>lmu</strong> (<em>np.array</em>) -- The muons' track lengths</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>add_tracks, add_tracks_sd</strong> -- The additional track lengths and standard deviations</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fennel">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fennel" title="Permalink to this headline"></a></h2>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Stephan Meighen-Berger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
 </footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
 </body>
 </html>

@@ -1,0 +1,9 @@
+# Ignore everything in this directory
+*
+# Except these files
+!.gitignore
+!conf.py
+!index.rst
+!make.bat
+!Makefile
+!modules.rst
