@@ -6,4 +6,3 @@ numpy
 scipy
 tqdm
 flake8
-pickle

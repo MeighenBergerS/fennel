@@ -12,7 +12,6 @@ setup(
         "PyYAML",
         "numpy",
         "scipy",
-        "pickle"
     ],
     extras_require={
         "interactive": ["nbstripout", "matplotlib", "jupyter", "tqdm"],
