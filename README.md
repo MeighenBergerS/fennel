@@ -50,6 +50,12 @@ https://meighenbergers.github.io/fennel/
 
 ## Installation <a name="installation"></a>
 
+Install using pip:
+```python
+pip install fennel-seed
+```
+
+Other options:
 To install please clone the repository or download the latest release. Then
 follow the instructions given in INSTALL.txt.
 Note this should install all necessary components.
