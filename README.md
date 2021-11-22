@@ -41,7 +41,7 @@ and
 
 https://www.institut3b.physik.rwth-aachen.de/global/show_document.asp?id=aaaaaaaaaapwhjz
 
-Please cite this page and their work when using this package.
+Please cite this [page](https://github.com/MeighenBergerS/fennel) and their work when using this package.
 
 ## Documentation <a name="documentation"></a>
 
@@ -57,7 +57,7 @@ pip install fennel_seed
 [The PyPi webpage](https://pypi.org/project/fennel-seed/)
 
 Other options:
-To install please clone the repository or download the latest release. Then
+To install please clone the (repository)[https://github.com/MeighenBergerS/fennel] or download the latest release. Then
 follow the instructions given in INSTALL.txt.
 Note this should install all necessary components.
 
