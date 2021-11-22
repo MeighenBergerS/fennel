@@ -5,5 +5,5 @@ matplotlib
 numpy
 scipy
 tqdm
-jax
+jax[cpu]
 flake8
