@@ -41,7 +41,18 @@ and
 
 https://www.institut3b.physik.rwth-aachen.de/global/show_document.asp?id=aaaaaaaaaapwhjz
 
-Please cite this [page](https://github.com/MeighenBergerS/fennel) and their work when using this package.
+Please cite this [software](https://github.com/MeighenBergerS/fennel) using
+```
+@software{fennel2021@github,
+  author = {Stephan Meighen-Berger},
+  title = {{Fennel}: Light from tracks and cascades,
+  url = {https://github.com/MeighenBergerS/fennel},
+  version = {1.0.0},
+  year = {2021},
+}
+```
+
+and their work when using this package.
 
 ## Documentation <a name="documentation"></a>
 
