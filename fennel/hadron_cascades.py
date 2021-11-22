@@ -61,7 +61,7 @@ class Hadron_Cascade(object):
         if config["scenario"]["parametrization"] == "aachen":
             _log.info("Loading the aachen parametrization")
             muon_data = pkgutil.get_data(
-                    __name__, "../data/aachen/muon_production.pkl"
+                    __name__, "data/muon_production.pkl"
             )
             if muon_data is None:
                 ValueError("Muon production data not found!")

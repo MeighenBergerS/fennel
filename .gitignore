@@ -10,3 +10,4 @@ venv3
 *.json
 
 Fennel.egg-info
+build

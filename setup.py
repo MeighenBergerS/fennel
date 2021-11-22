@@ -17,5 +17,7 @@ setup(
         "interactive": ["nbstripout", "matplotlib", "jupyter", "tqdm"],
     },
     packages=["fennel"],
-    package_data={'fennel': ["data/*.pkl"]}
+    package_data={'fennel': ["data/*.pkl"]},
+    url='https://github.com/MeighenBergerS/fennel',
+    include_package_data=True
 )
