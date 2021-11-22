@@ -140,8 +140,8 @@ class Fennel(object):
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
 
-    def sim(self):
-        """ Calculates the light yields depending on input
+    def close(self):
+        """ Wraps up the program
 
         Parameters
         ----------
@@ -154,7 +154,6 @@ class Fennel(object):
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
         # A new simulation
-        self._statistics = self._photon._sim()
         if config["general"]["enable logging"]:
             _log.debug(
                 "Dumping run settings into %s",
@@ -174,21 +173,6 @@ class Fennel(object):
         _log.info('---------------------------------------------------')
         # Closing log
         logging.shutdown()
-
-    @property
-    def statistics(self):
-        """ Getter functions for the simulation results
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        statistics : pandas.DataFrame
-            Stores the results from the simulation
-        """
-        return self._statistics
 
     def track_yields(
             self,

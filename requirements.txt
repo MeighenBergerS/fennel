@@ -5,4 +5,5 @@ matplotlib
 numpy
 scipy
 tqdm
+jax
 flake8

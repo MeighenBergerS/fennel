@@ -26,6 +26,9 @@ _baseconfig = {
         "log file handler": "../run/fennel.log",
         # Dump experiment config to this location
         "config location": "../run/fennel.txt",
+        # JAX switch -- If true Jax functions will be used
+        # Please note that JAX does not support Windows
+        "jax": True,
     },
     ###########################################################################
     # Scenario

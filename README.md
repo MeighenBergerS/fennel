@@ -67,9 +67,22 @@ pip install fennel_seed
 ```
 [The PyPi webpage](https://pypi.org/project/fennel-seed/)
 
-Other options:
+Other installation methods:
 To install please clone the (repository)[https://github.com/MeighenBergerS/fennel] or download the latest release. Then
 follow the instructions given in INSTALL.txt.
 Note this should install all necessary components.
 
 Or install using the setup.py
+
+Please note that JAX is not included in the basic installation.
+To use this option, please also install JAX or install fennel using:
+Install using pip:
+```python
+pip install fennel_seed[jax]
+```
+
+To be able to run the example notebook use
+Install using pip:
+```python
+pip install fennel_seed[interactive]
+```
