@@ -384,7 +384,6 @@ _baseconfig = {
         # Energy threshold for continuous losses
         "threshold E": 0.5,  # In GeV
         "energy grid": np.logspace(0., 9, 91),
-        "Cherenkov distro": "symmetric",
         "fine structure": 0.0072973525693,
         "particle charge": 1.,  # Charge of the particle of interest
         "wavelengths": np.linspace(350., 500., 100),  # in nm

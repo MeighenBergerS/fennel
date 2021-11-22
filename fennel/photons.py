@@ -9,6 +9,10 @@ from .config import config
 from .tracks import Track
 from .em_cascades import EM_Cascade
 from .hadron_cascades import Hadron_Cascade
+if config["general"]["jax"]:
+    import jax.numpy as jnp
+    from jax import jit
+
 
 _log = logging.getLogger(__name__)
 
@@ -97,48 +101,79 @@ class Photon(object):
         angles : np.array
             The angular distribution in degrees
         """
-        if function:
+        if config["general"]["jax"]:
+            _log.info("Only function are returned when using jax!")
             def counts(energy, wavelengths, interaction):
-                """ Fetcher function for a specific particle and energy. This is for
-                tracks and their photon counts
+                """ Fetcher function for a specific particle
+                and energy. This is for tracks and their photon counts
 
                 Parameters
                 ----------
-                energy : float/np.array
+                energy : float
                     The energy of the particle
-                wavelengths : np.array
+                wavelengths : float
                     The wavelengths of interest
                 mean : bool
-                    Optional: Switch to use either the mean value or a sample
+                    Optional: Switch to use either
+                    the mean value or a sample
 
                 Returns
                 -------
-                counts : float/np.array
+                counts : float
                     The photon counts
                 """
                 tmp_track_frac = (
-                    self.__track.additional_track_ratio_fetcher(
+                    self.__track.additional_track_ratio(
+                        energy, interaction
+                    )
+                )
+                new_track = deltaL * (1. + tmp_track_frac)
+                return self._cherenkov_counts_jax(wavelengths, new_track)
+            angles = self.__track.cherenkov_angle_distro
+        else:
+            if function:
+                def counts(energy, wavelengths, interaction):
+                    """ Fetcher function for a specific particle
+                    and energy. This is for tracks and their photon counts
+
+                    Parameters
+                    ----------
+                    energy : float/np.array/jnp.array
+                        The energy of the particle
+                    wavelengths : np.array/jnp.array
+                        The wavelengths of interest
+                    mean : bool
+                        Optional: Switch to use either
+                        the mean value or a sample
+
+                    Returns
+                    -------
+                    counts : float/np.array/jnp.array
+                        The photon counts
+                    """
+                    tmp_track_frac = (
+                        self.__track.additional_track_ratio(
+                            energy, interaction
+                        )
+                    )
+                    new_track = deltaL * (1. + tmp_track_frac)
+                    new_track = np.array([new_track]).flatten()
+                    return jit(self._cherenkov_counts(wavelengths, new_track))
+                angles = jit(self.__track.cherenkov_angle_distro)
+            else:
+                tmp_track_frac = (
+                    self.__track.additional_track_ratio(
                         energy, interaction
                     )
                 )
                 new_track = deltaL * (1. + tmp_track_frac)
                 new_track = np.array([new_track]).flatten()
-                return self._cherenkov_counts(wavelengths, new_track)
-            angles = self.__track._symmetric_angle_distro_fetcher
-        else:
-            tmp_track_frac = (
-                self.__track.additional_track_ratio_fetcher(
-                    energy, interaction
-                )
-            )
-            new_track = deltaL * (1. + tmp_track_frac)
-            new_track = np.array([new_track]).flatten()
-            counts = self._cherenkov_counts(self._wavelengths, new_track)
-            # The angular distribution
-            angles = self.__track._symmetric_angle_distro_fetcher(
-                self._angle_grid,
-                self._n,
-                energy)
+                counts = self._cherenkov_counts(self._wavelengths, new_track)
+                # The angular distribution
+                angles = self.__track.cherenkov_angle_distro(
+                    self._angle_grid,
+                    self._n,
+                    energy)
         return counts, angles
 
     def _em_cascade_fetcher(
@@ -412,3 +447,31 @@ class Photon(object):
             for lambd in wavelengths
         ])
         return diff_counts * 1e-9 / np.pi
+
+    def _cherenkov_counts_jax(
+            self,
+            wavelengths: float, track_lengths: float) -> float:
+        """ Calculates the differential number of photons for the given
+        wavelengths and track-lengths assuming a constant velocity with beta=1.
+
+        Parameters
+        ----------
+        wavelengths : float
+            The wavelengths of interest
+        track_lengths : float
+            The track lengths of interest in cm
+
+        Returns
+        -------
+        counts : float
+            The counts (differential)
+        """
+        prefac = (
+            2. * jnp.pi * self._alpha * self._charge**2. /
+            (1. - 1. / self._n**2.)
+        )
+        # 1e-7 due to the conversion from nm to cm
+        diff_counts = (
+            prefac / (wavelengths * 1e-9)**2. * track_lengths * 1e-2
+        )
+        return diff_counts * 1e-9 / jnp.pi

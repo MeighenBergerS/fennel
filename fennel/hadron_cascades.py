@@ -53,10 +53,7 @@ class Hadron_Cascade(object):
         self._n = self._medium["refractive index"]
         self._radlength = self._medium["radiation length"]
         self._Lrad = self._radlength / self._medium["density"]
-        if config["advanced"]["Cherenkov distro"] == "symmetric":
-            self.cherenkov_angle_distro = self._symmetric_angle_distro_fetcher
-        else:
-            ValueError("Distribution type not implemented!")
+        self.cherenkov_angle_distro = self._symmetric_angle_distro_fetcher
         if config["scenario"]["parametrization"] == "aachen":
             _log.info("Loading the aachen parametrization")
             muon_data = pkgutil.get_data(
@@ -166,7 +163,7 @@ class Hadron_Cascade(object):
         a = np.array([a]).flatten()
         # gamma.pdf seems far slower than the explicit implementation
         res = np.array([
-            t * b * (
+            b * (
                 (t * b)**(a_val - 1.) * np.exp(-(t*b)) / gamma_func(a_val)
             ) for a_val in a
         ])

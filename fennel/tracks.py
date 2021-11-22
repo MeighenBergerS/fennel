@@ -8,7 +8,7 @@ import numpy as np
 from .config import config
 # Checking if jax should be used
 if config["general"]["jax"]:
-    import jax
+    import jax.numpy as jnp
 
 
 _log = logging.getLogger(__name__)
@@ -47,15 +47,25 @@ class Track(object):
         _log.debug('Constructing a track object')
         self._medium = config["scenario"]["medium"]
         self._n = config["mediums"][self._medium]["refractive index"]
-        if config["advanced"]["Cherenkov distro"] == "symmetric":
-            self.cherenkov_angle_distro = self._symmetric_angle_distro_fetcher
+        if config["general"]["jax"]:
+            _log.debug("Using JAX")
+            self.additional_track_ratio = (
+                self._additional_track_ratio_fetcher_jax
+            )
+            self.cherenkov_angle_distro = (
+                self._symmetric_angle_distro_fetcher_jax
+            )
         else:
-            ValueError("Distribution type not implemented!")
+            _log.debug("Using basic numpy")
+            self.additional_track_ratio = self._additional_track_ratio_fetcher
+            self.cherenkov_angle_distro = self._symmetric_angle_distro_fetcher
 
-    def additional_track_ratio_fetcher(
+    ###########################################################################
+    # Basic numpy
+    def _additional_track_ratio_fetcher(
             self, E, interaction: str) -> np.array:
         """ Calculates the ratio between the additional track length
-        and the original for a single energy
+        and the original for a single energy.
 
         Parameters
         ----------
@@ -66,7 +76,7 @@ class Track(object):
 
         Returns
         -------
-        ratio : float
+        ratio : np.array
             The resulting ratio
         """
         params = config["track"]["additional track " + self._medium][
@@ -139,4 +149,92 @@ class Track(object):
         a = a_pars[0] * (np.log(E)) * a_pars[1]
         b = b_pars[0] * (np.log(E)) * b_pars[1]
         c = c_pars[0] * (np.log(E)) * c_pars[1]
+        return a, b, c
+
+    ###########################################################################
+    # JAX
+    def _additional_track_ratio_fetcher_jax(
+            self, E: float, interaction: str) -> float:
+        """ Calculates the ratio between the additional track length
+        and the original for a single energy. JAX implementation
+
+        Parameters
+        ----------
+        E : float
+            The energy of the particle in GeV
+        interaction : str
+            Name of the interaction
+
+        Returns
+        -------
+        ratio : float
+            The resulting ratio
+        """
+        params = config["track"]["additional track " + self._medium][
+            interaction
+        ]
+        lambd = params["lambda"]
+        kappa = params["kappa"]
+        ratio = (
+            lambd + kappa * jnp.log(E)
+        )
+        return ratio
+
+    def _symmetric_angle_distro_fetcher_jax(
+            self,
+            phi: float, n: float,
+            E: float) -> float:
+        # TODO: Add asymmetry function
+        """ Calculates the symmetric angular distribution of the Cherenkov
+        emission for a single energy. The error should lie below 10%.
+        JAX implementation
+
+        Parameters
+        ----------
+        phi : float
+            The angles of interest in degrees
+        n : float
+            The refractive index
+        E : float
+            The energy of interest
+
+        Returns
+        -------
+        distro : float
+            The distribution of emitted photons given the angle. The
+            result is a 2d array with the first axis for the angles and
+            the second for the energies.
+        """
+        a, b, c = self._energy_dependence_angle_pars_jax(E)
+        distro = (a * jnp.exp(b * jnp.abs(
+                1. / n - jnp.cos(jnp.deg2rad(phi)))**c
+            ))
+        return distro
+
+    def _energy_dependence_angle_pars_jax(
+            self, E: float) -> float:
+        """ Parametrizes the energy dependence of the angular distribution
+        parameters. JAX implementation
+
+        Parameters
+        ----------
+        E : jnp.array
+            The energies of interest
+
+        Returns
+        -------
+        a : float
+            The first parameter value for the given energy
+        b : float
+            The second parameter value for the given energy
+        c : float
+            The third parameter value for the given energy
+        """
+        params = config["track"]["angular distribution"]
+        a_pars = params["a pars"]
+        b_pars = params["b pars"]
+        c_pars = params["c pars"]
+        a = a_pars[0] * (jnp.log(E)) * a_pars[1]
+        b = b_pars[0] * (jnp.log(E)) * b_pars[1]
+        c = c_pars[0] * (jnp.log(E)) * c_pars[1]
         return a, b, c
