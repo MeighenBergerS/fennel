@@ -10,4 +10,6 @@ venv3
 *.json
 
 Fennel.egg-info
+fennel_seed.egg-info
 build
+dist

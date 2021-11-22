@@ -52,7 +52,7 @@ https://meighenbergers.github.io/fennel/
 
 Install using pip:
 ```python
-pip install fennel-seed
+pip install fennel_seed
 ```
 
 Other options:

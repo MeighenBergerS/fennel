@@ -10,7 +10,7 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 setup(
-    name="fennel-seed",
+    name="fennel_seed",
     version="1.0",
     description="Light-yields for tracks, and cascades",
     long_description=README,
