@@ -16,5 +16,6 @@ setup(
     extras_require={
         "interactive": ["nbstripout", "matplotlib", "jupyter", "tqdm"],
     },
-    packages=["fennel"]
+    packages=["fennel"],
+    package_data={'fennel': ["data/*.pkl"]}
 )

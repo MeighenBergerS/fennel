@@ -8,3 +8,5 @@ fennel.log
 venv3
 
 *.json
+
+Fennel.egg-info

@@ -9,6 +9,7 @@ from scipy.stats import gamma
 from scipy.special import gamma as gamma_func
 from scipy.interpolate import UnivariateSpline
 import pickle
+import pkgutil
 from .config import config
 from .particle import Particle
 
@@ -45,6 +46,8 @@ class Hadron_Cascade(object):
         ------
         ValueError
             Other distribution type for emission angles is not implemented
+        ValueError
+            File containing the muon production data was not found
         """
         _log.debug('Constructing a hadron cascade object')
         self._medium = config["mediums"][config["scenario"]["medium"]]
@@ -57,9 +60,12 @@ class Hadron_Cascade(object):
             ValueError("Distribution type not implemented!")
         if config["scenario"]["parametrization"] == "aachen":
             _log.info("Loading the aachen parametrization")
-            self.__muon_prod_dict = pickle.load(
-                open("../data/aachen/muon_production.pkl", "rb")
+            muon_data = pkgutil.get_data(
+                    __name__, "../data/aachen/muon_production.pkl"
             )
+            if muon_data is None:
+                ValueError("Muon production data not found!")
+            self.__muon_prod_dict = pickle.loads(muon_data)
             _log.debug("Constructing spline dictionary")
             self.__muon_prod_spl_pars = {}
             for pdg_id in config["simulation"]["hadron particles"]:
