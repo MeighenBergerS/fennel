@@ -54,6 +54,7 @@ Install using pip:
 ```python
 pip install fennel_seed
 ```
+[The PyPi webpage](https://pypi.org/project/fennel-seed/)
 
 Other options:
 To install please clone the repository or download the latest release. Then
