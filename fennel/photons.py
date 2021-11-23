@@ -9,10 +9,13 @@ from .config import config
 from .tracks import Track
 from .em_cascades import EM_Cascade
 from .hadron_cascades import Hadron_Cascade
-if config["general"]["jax"]:
+try:
     import jax.numpy as jnp
     from jax import jit
     from jax.random import normal as jnormal
+except ImportError:
+    if config["general"]["jax"]:
+        ImportError("Jax not found!")
 
 
 _log = logging.getLogger(__name__)
@@ -78,10 +81,11 @@ class Photon(object):
         _log.info("Building the necessary functions")
         self._track_builder()
         self._em_cascade_builder()
-        # Tracks
-
+        self._hadron_cascade_builder()
         _log.debug('Finished a photon object.')
 
+    ###########################################################################
+    # The Fetchers
     def _track_fetcher(
             self, energy,
             wavelengths=config["advanced"]["wavelengths"],
@@ -196,7 +200,6 @@ class Photon(object):
         angles : function/float/np.array
             The angular distribution in degrees
         """
-        print(particle)
         if function:
             _log.debug("Fetching em functions for pdg_id " + str(particle))
             return (
@@ -251,10 +254,135 @@ class Photon(object):
                         self._em_cascade_function_dic[particle][
                             "angle distro"](
                                 angle_grid,
-                                n,
-                                energy
+                                n
                             )
                 )
+
+    def _hadron_cascade_fetcher(
+            self, energy,
+            particle: int,
+            wavelengths=config["advanced"]["wavelengths"],
+            angle_grid=config["advanced"]["angles"],
+            n=config["mediums"][
+                config["scenario"]["medium"]]["refractive index"],
+            z_grid=config["advanced"]["z grid"],
+            function=False):
+        """ Fetcher function for a specific particle and energy. This is for
+        hadron cascades.
+
+       Parameters
+        ----------
+        energy : float
+            The energy(ies) of the particle in GeV
+        particle : int
+            The pdg id of the particle of interest
+        wavelengths : np.array
+            Optional: The desired wavelengths
+        angle_grid : np.array
+            Optional: The desired angles in degress
+        n : float
+            Optional: The refractive index of the medium.
+        z_grid : np.array
+            Optional: The grid in cm for the long. distributions
+        function : bool
+            Optional: returns the functional form instead of the evaluation
+
+        Returns
+        -------
+        differential_counts : function/float/np.array
+            dN/dlambda The differential photon counts per track length (in cm).
+            The shape of the array is (len(wavelengths), len(deltaL)).
+        differential_counts_sample : float/np.array
+            A sample of the differential counts distribution. Same shape as
+            the differential counts
+        long_profile : function/float/np.array
+            The distribution along the shower axis for cm
+        angles : function/float/np.array
+            The angular distribution in degrees
+        """
+        if function:
+            _log.debug("Fetching em functions for pdg_id " + str(particle))
+            return (
+                self._hadron_cascade_function_dic[particle]["dcounts"],
+                self._hadron_cascade_function_dic[particle]["dcounts sample"],
+                self._hadron_cascade_function_dic[particle][
+                    "em fraction mean"
+                ],
+                self._hadron_cascade_function_dic[particle][
+                    "em fraction sample"
+                ],
+                self._hadron_cascade_function_dic[particle]["long distro"],
+                self._hadron_cascade_function_dic[particle]["angle distro"]
+            )
+        # Fetching explicit values
+        else:
+            _log.debug("Fetching track values for " + str(particle))
+            if config["general"]["jax"]:
+                return(
+                    np.array([
+                        self._hadron_cascade_function_dic[particle]["dcounts"](
+                            energy, wavelength
+                        )
+                        for wavelength in wavelengths
+                    ]),
+                    np.array([
+                        self._hadron_cascade_function_dic[particle][
+                            "dcounts sample"
+                            ](energy, wavelength)
+                        for wavelength in wavelengths
+                    ]),
+                    (
+                        self._hadron_cascade_function_dic[particle][
+                            "em fraction mean"
+                            ](energy)
+                    ),
+                    (
+                        self._hadron_cascade_function_dic[particle][
+                            "em fraction sample"
+                            ](energy)
+                    ),
+                    np.array([
+                        self._hadron_cascade_function_dic[particle][
+                            "long distro"
+                            ](energy, z)
+                        for z in z_grid
+                    ]),
+                    np.array([
+                        self._hadron_cascade_function_dic[particle][
+                            "angle distro"](
+                                energy,
+                                angle,
+                                n
+                            )
+                        for angle in angle_grid
+                    ]),
+                )
+            else:
+                return(
+                        self._hadron_cascade_function_dic[particle]["dcounts"](
+                            energy, wavelengths
+                        ),
+                        self._hadron_cascade_function_dic[particle][
+                            "dcounts sample"
+                            ](energy, wavelengths),
+                        self._hadron_cascade_function_dic[particle][
+                            "em fraction mean"
+                            ](energy),
+                        self._hadron_cascade_function_dic[particle][
+                            "em fraction sample"
+                            ](energy),
+                        self._hadron_cascade_function_dic[particle][
+                            "long distro"
+                            ](energy, z_grid),
+                        self._hadron_cascade_function_dic[particle][
+                            "angle distro"](
+                                energy,
+                                angle_grid,
+                                n
+                            )
+                )
+    ###########################################################################
+    # The Builders
 
     def _track_builder(self):
         """ Builder function for the track functions.
@@ -419,9 +547,14 @@ class Photon(object):
                         energy, name
                     )
                 )
-                tmp_track_sample = (
-                    tmp_track + tmp_track_sd * jnormal(self._rstate)
-                )
+                if config["general"]["jax"]:
+                    tmp_track_sample = (
+                        tmp_track + tmp_track_sd * jnormal(self._rstate)
+                    )
+                else:
+                    tmp_track_sample = self._rstate.normal(
+                        tmp_track, tmp_track_sd
+                    )
                 return tmp_track_sample
 
             def long_profile(energy, z_grid, name=name):
@@ -583,148 +716,293 @@ class Photon(object):
                 "angle distro": angles,
             }
 
-    def _hadron_cascade_fetcher(
-            self, energy: float, particle: int,
-            mean=True, function=False):
-        """ Fetcher function for a specific particle and energy. This is for
-        hadron cascades and currently only symmetric distros
+    def _hadron_cascade_builder(self):
+        """ Builder function for a hadronic cascades.
 
         Parameters
         ----------
-        energy : float
-            The energy of the particle
-        particle : int
-            The particle of interest with its pdg id
-        mean : bool
-            Optional: Switch to use either the mean value or a sample
-        function : bool
-            Optional: Switches between the functional and explicit forms
+        None
 
         Returns
         -------
-        differential_counts : np.array
-            dN/dlambda The differential photon counts per track length (in cm).
-            The shape of the array is (len(wavelengths), len(deltaL)).
-        long_profile : np.array
-            The distribution along the shower axis for cm
-        em_fraction : np.array
-            The amount of em in the shower
-        angles : np.array
-            The angular distribution in degrees
+        None
         """
-        if function:
-            def counts(energy, wavelengths, particle, mean=True):
+        _log.debug("Building the hadron cascade functions")
+        self._hadron_cascade_function_dic = {}
+        for particle_id in config["simulation"]["hadron particles"]:
+            name = particle_id
+            self._hadron_cascade_function_dic[particle_id] = {}
+
+            def track_mean(energy, name=name):
                 """ Fetcher function for a specific particle and energy.
                 This is for hadron cascades and their photon counts
 
                 Parameters
                 ----------
-                energy : float/np.array
+                energy : float
                     The energy of the particle
-                wavelengths : np.array
-                    The wavelengths of interest
-                particle : int
-                    The particle of interest with its pdg id
-                mean : bool
-                    Optional: Switch to use either the mean value or a sample
+                name : int
+                    The name of the particle of interest
 
                 Returns
                 -------
-                counts : float/np.array
-                    The photon counts
+                tmp_track : float
+                    The track length
                 """
-                tmp_track, tmp_track_sd = (
-                    self.__hadron_cascade.track_lengths_fetcher(
-                        energy,
-                        self.__particles[particle]
+                tmp_track, _ = (
+                    self.__hadron_cascade.track_lengths(
+                        energy, name
                     )
                 )
-                # Light yields
-                if mean:
-                    tmp_track = np.array([tmp_track]).flatten()
-                    return self._cherenkov_counts(
-                        wavelengths, tmp_track
+                return tmp_track
+
+            def track_sampler(energy, name=name):
+                """ Fetcher function for a specific particle and energy.
+                This samples the distribution
+
+                Parameters
+                ----------
+                energy : float
+                    The energy of the particle
+                name : int
+                    The name of the particle of interest
+
+                Returns
+                -------
+                tmp_track_sample : float
+                    The sampled photon counts
+                """
+                tmp_track, tmp_track_sd = (
+                    self.__hadron_cascade.track_lengths(
+                        energy, name
+                    )
+                )
+                if config["general"]["jax"]:
+                    tmp_track_sample = (
+                        tmp_track + tmp_track_sd * jnormal(self._rstate)
                     )
                 else:
                     tmp_track_sample = self._rstate.normal(
                         tmp_track, tmp_track_sd
                     )
-                    tmp_track_sample = np.array([tmp_track_sample]).flatten()
-                    return self._cherenkov_counts(
-                        wavelengths, tmp_track_sample
-                    )
+                return tmp_track_sample
 
-            def em_fraction(energy, particle, mean=True):
-                """ Fetcher function for a specific particle and energy. This is for
-                hadron cascades and their em fraction
+            def em_fraction_mean(energy, name=name):
+                """ The em fraction mean of the hadron cascade
 
                 Parameters
                 ----------
-                energy : float/np.array
+                energy : float
                     The energy of the particle
-                particle : int
-                    The particle of interest with its pdg id
-                mean : bool
-                    Optional: Switch to use either the mean value or a sample
+                name : int
+                    The name of the particle of interest
 
                 Returns
                 -------
-                fraction : float/np.array
-                    The fraction
+                em_frac_mean : float/np.array
+                    The resulting em fraction
                 """
-                tmp_fract, tmp_fract_sd = (
-                    self.__hadron_cascade.em_fraction_fetcher(
-                        energy, self.__particles[particle]
+                em_frac_mean, _ = (
+                    self.__hadron_cascade.em_fraction(energy, name)
+                )
+                return em_frac_mean
+
+            def em_fraction_sampler(energy, name=name):
+                """ The em fraction sample of the hadron cascade
+
+                Parameters
+                ----------
+                energy : float
+                    The energy of the particle
+                name : int
+                    The name of the particle of interest
+
+                Returns
+                -------
+                em_frac_sample : float/np.array
+                    The resulting em fraction
+                """
+                em_frac_mean, em_frac_std = (
+                    self.__hadron_cascade.em_fraction(energy, name)
+                )
+                if config["general"]["jax"]:
+                    em_frac_sample = (
+                        em_frac_mean + em_frac_std * jnormal(self._rstate)
                     )
-                )
-                if mean:
-                    return tmp_fract
                 else:
-                    return self._rstate.normal(tmp_fract, tmp_fract_sd)
-            long_profile = (
-                self.__hadron_cascade._log_profile_func_fetcher
-            )
-            # Angle distribution
-            angles = self.__hadron_cascade._symmetric_angle_distro_fetcher
-        else:
-            # The track length
-            tmp_track, tmp_track_sd = (
-                self.__hadron_cascade.track_lengths_fetcher(
+                    em_frac_sample = self._rstate.normal(
+                        em_frac_mean, em_frac_std
+                    )
+                return em_frac_sample
+
+            def long_profile(energy, z_grid, name=name):
+                """ The longitudinal profile of the hadron cascade
+
+                Parameters
+                ----------
+                energy : float
+                    The energy of the particle
+                z_grid : float/np.array
+                    The grid to evaluate the distribution in in cm
+                name : int
+                    The name of the particle of interest
+
+                Returns
+                -------
+                long_distro : float/np.array
+                    The resulting longitudinal distribution
+                """
+                return self.__hadron_cascade.long_profile(energy, z_grid, name)
+
+            def angle_distro(
                     energy,
-                    self.__particles[particle]
+                    angles,
+                    n=config["mediums"][self._medium]["refractive index"],
+                    name=name
+                    ):
+                """ The angle distribution of the cherenkov photons for
+                the hadron cascade
+
+                Parameters
+                ----------
+                angles : float/np.array
+                    The angles of interest
+                n : float
+                    Optional: The refractive index of the material
+                name : int
+                    Optional: The name of the particle of interest
+
+                Returns
+                -------
+                angle_distro : float/np.array
+                    The resulting longitudinal distribution
+                """
+                return self.__hadron_cascade.cherenkov_angle_distro(
+                    energy, angles, n, name
                 )
-            )
-            # Light yields
-            if mean:
-                counts = self._cherenkov_counts(
-                    self._wavelengths, [tmp_track]
+            # Storing the functions
+            if config["general"]["jax"]:
+                _log.debug(
+                    "Constructing Jax function for pdg_id " + str(name)
                 )
+
+                def counts_mean(energy, wavelengths, name=name):
+                    """Calculates the differential photon counts.
+                    Jax implemenation
+
+                    Parameters
+                    ----------
+                    energy : float
+                        The energy of the particle in GeV
+                    wavelengths: float
+                        The wavelength(s) of interest
+                    name : int
+                        Name of the particle
+
+                    Returns
+                    -------
+                    differential_counts : float
+                        The differential photon counts
+                        per track length (in cm).
+                    """
+                    new_track = track_mean(energy, name=name)
+                    return self._cherenkov_counts_jax(wavelengths, new_track)
+
+                def counts_sampler(energy, wavelengths, name=name):
+                    """Calculates a sample of the differential photon counts.
+                    Jax implemenation
+
+                    Parameters
+                    ----------
+                    energy : float
+                        The energy of the particle in GeV
+                    wavelengths: float
+                        The wavelength(s) of interest
+                    name : int
+                        Name of the particle
+
+                    Returns
+                    -------
+                    differential_counts : float
+                        The differential photon counts
+                        per track length (in cm).
+                    """
+                    new_track = track_sampler(energy, name=name)
+                    return self._cherenkov_counts_jax(wavelengths, new_track)
+                # Jit the jax functions
+                counts = jit(counts_mean, static_argnames=['name'])
+                counts_sample = jit(counts_sampler, static_argnames=['name'])
+                em_frac_mean = jit(em_fraction_mean, static_argnames=['name'])
+                em_frac_sample = jit(
+                    em_fraction_sampler,
+                    static_argnames=['name']
+                )
+                long = jit(long_profile, static_argnames=['name'])
+                angles = jit(angle_distro, static_argnames=['name'])
             else:
-                tmp_track_sample = self._rstate.normal(tmp_track, tmp_track_sd)
-                counts = self._cherenkov_counts(
-                    self._wavelengths, [tmp_track_sample]
+                _log.debug(
+                    "Constructing numpy function for pdg_id " + str(name)
                 )
-            # EM Fraction
-            tmp_fract, tmp_fract_sd = (
-                self.__hadron_cascade.em_fraction_fetcher(
-                    energy, self.__particles[particle]
-                )
-            )
-            if mean:
-                em_fraction = tmp_fract
-            else:
-                em_fraction = self._rstate.normal(tmp_fract, tmp_fract_sd, 1)
-            # Long profile
-            long_profile = (
-                self.__hadron_cascade._log_profile_func_fetcher(
-                    energy, self._zgrid, self.__particles[particle]
-                )
-            )
-            # Angle distribution
-            angles = self.__hadron_cascade._symmetric_angle_distro_fetcher(
-                energy, self._angle_grid, self._n, self.__particles[particle]
-            )
-        return counts, long_profile, em_fraction, angles
+
+                def counts_mean(energy, wavelengths, name=name):
+                    """Calculates the differential photon counts.
+                    Jax implemenation
+
+                    Parameters
+                    ----------
+                    energy : float
+                        The energy of the particle in GeV
+                    wavelengths: np.array
+                        The wavelength(s) of interest
+                    name : int
+                        Name of the particle
+
+                    Returns
+                    -------
+                    differential_counts : np.array
+                        The differential photon counts
+                        per track length (in cm).
+                    """
+                    new_track = track_mean(energy, name=name)
+                    return self._cherenkov_counts(wavelengths, new_track)
+
+                def counts_sampler(energy, wavelengths, name=name):
+                    """Calculates a sample of the differential photon counts.
+                    Jax implemenation
+
+                    Parameters
+                    ----------
+                    energy : float
+                        The energy of the particle in GeV
+                    wavelengths: np.array
+                        The wavelength(s) of interest
+                    name : int
+                        Name of the particle
+
+                    Returns
+                    -------
+                    differential_counts : np.array
+                        The differential photon counts
+                        per track length (in cm).
+                    """
+                    new_track = track_sampler(energy, name=name)
+                    return self._cherenkov_counts(wavelengths, new_track)
+                # Don't jist the numpy functions
+                counts = counts_mean
+                counts_sample = counts_sampler
+                em_frac_mean = em_fraction_mean
+                em_frac_sample = em_fraction_sampler
+                long = long_profile
+                angles = angle_distro
+            # Storing
+            self._hadron_cascade_function_dic[particle_id] = {
+                "dcounts": counts,
+                "dcounts sample": counts_sample,
+                "em fraction mean": em_frac_mean,
+                "em fraction sample": em_frac_sample,
+                "long distro": long,
+                "angle distro": angles,
+            }
 
     def _cherenkov_counts(
             self,

@@ -28,7 +28,7 @@ _baseconfig = {
         "config location": "../run/fennel.txt",
         # JAX switch -- If true Jax functions will be used
         # Please note that JAX does not support Windows
-        "jax": True,
+        "jax": False,
     },
     ###########################################################################
     # Scenario

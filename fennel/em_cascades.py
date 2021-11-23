@@ -7,9 +7,12 @@ import logging
 import numpy as np
 from scipy.special import gamma as gamma_func
 from .config import config
-if config["general"]["jax"]:
+try:
     import jax.numpy as jnp
     from jax.scipy.stats import gamma as jax_gamma
+except ImportError:
+    if config["general"]["jax"]:
+        ImportError("Jax not found!")
 
 _log = logging.getLogger(__name__)
 

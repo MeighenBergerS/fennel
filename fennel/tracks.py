@@ -7,8 +7,11 @@ import logging
 import numpy as np
 from .config import config
 # Checking if jax should be used
-if config["general"]["jax"]:
+try:
     import jax.numpy as jnp
+except ImportError:
+    if config["general"]["jax"]:
+        ImportError("Jax not found!")
 
 
 _log = logging.getLogger(__name__)

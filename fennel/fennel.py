@@ -20,8 +20,11 @@ from .tracks import Track
 from .em_cascades import EM_Cascade
 from .hadron_cascades import Hadron_Cascade
 from .photons import Photon
-if config["general"]["jax"]:
+try:
     from jax.random import PRNGKey
+except ImportError:
+    if config["general"]["jax"]:
+        ImportError("Jax not found!")
 
 # unless we put this class in __init__, __name__ will be contagion.contagion
 _log = logging.getLogger("fennel")
@@ -266,33 +269,47 @@ class Fennel(object):
         )
 
     def hadron_yields(
-            self, energy, particle,
-            mean, function=False):
+            self, energy,
+            particle: int,
+            wavelengths=config["advanced"]["wavelengths"],
+            angle_grid=config["advanced"]["angles"],
+            n=config["mediums"][
+                config["scenario"]["medium"]]["refractive index"],
+            z_grid=config["advanced"]["z grid"],
+            function=False):
         """ Fetcher function for a specific particle and energy. This is for
-        hadron cascades and currently only symmetric distros
+        hadron cascades.
 
-        Parameters
+       Parameters
         ----------
         energy : float
-            The energy of the particle
+            The energy(ies) of the particle in GeV
         particle : int
-            The particle of interest with its pdg id
-        mean : bool
-            Optional: Switch to use either the mean value or a sample
+            The pdg id of the particle of interest
+        wavelengths : np.array
+            Optional: The desired wavelengths
+        angle_grid : np.array
+            Optional: The desired angles in degress
+        n : float
+            Optional: The refractive index of the medium.
+        z_grid : np.array
+            Optional: The grid in cm for the long. distributions
         function : bool
-            Optional: Switches between the functional and explicit forms
+            Optional: returns the functional form instead of the evaluation
 
         Returns
         -------
-        counts : float
-            The photon counts
-        long_profile : np.array
-            The distribution along the shower axis
-        em_fraction : np.array
-            The amount of em in the shower
-        angles : np.array
-            The angular distribution
+        differential_counts : function/float/np.array
+            dN/dlambda The differential photon counts per track length (in cm).
+            The shape of the array is (len(wavelengths), len(deltaL)).
+        differential_counts_sample : float/np.array
+            A sample of the differential counts distribution. Same shape as
+            the differential counts
+        long_profile : function/float/np.array
+            The distribution along the shower axis for cm
+        angles : function/float/np.array
+            The angular distribution in degrees
         """
         return self._photon._hadron_cascade_fetcher(
-            energy, particle, mean, function
+            energy, particle, wavelengths, angle_grid, n, z_grid, function
         )
