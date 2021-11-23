@@ -39,6 +39,8 @@ class Particle(object):
         Raises
         ------
         """
+        if not config["general"]["enable logging"]:
+            _log.disabled = True
         _log.info('Constructing a particle')
         self._pdg_id = pdg_id
         # Naming conventions PDG Monte Carlo scheme

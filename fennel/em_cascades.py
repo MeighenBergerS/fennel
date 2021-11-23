@@ -47,6 +47,8 @@ class EM_Cascade(object):
         ValueError
             Other distribution type for emission angles is not implemented
         """
+        if not config["general"]["enable logging"]:
+            _log.disabled = True
         _log.debug('Constructing an em cascade object')
         self._medium = config["mediums"][config["scenario"]["medium"]]
         self._n = self._medium["refractive index"]

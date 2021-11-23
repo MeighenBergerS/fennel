@@ -62,6 +62,8 @@ class Photon(object):
         ValueError
             Other distribution type for emission angles is not implemented
         """
+        if not config["general"]["enable logging"]:
+            _log.disabled = True
         _log.debug('Constructing a photon object')
         self._medium = config["scenario"]["medium"]
         self._n = config["mediums"][self._medium]["refractive index"]
@@ -1006,7 +1008,7 @@ class Photon(object):
 
     def _cherenkov_counts(
             self,
-            wavelengths: np.array, track_lengths: np.array) -> np.array:
+            wavelengths: np.array, track_length: float) -> np.array:
         """ Calculates the differential number of photons for the given
         wavelengths and track-lengths assuming a constant velocity with beta=1.
 
@@ -1014,23 +1016,21 @@ class Photon(object):
         ----------
         wavelengths : np.array
             The wavelengths of interest
-        track_lengths : np.array
+        track_lengths : float
             The track lengths of interest in cm
 
         Returns
         -------
         counts : np.array
-            A 2-d array filled witht the produced photons. The first axis
-            defines the wavelengths, the second the track length.
+            A array filled witht the produced photons.
         """
         prefac = (
             2. * np.pi * self._alpha * self._charge**2. /
             (1. - 1. / self._n**2.)
         )
         # 1e-7 due to the conversion from nm to cm
-        diff_counts = np.array([[
-            prefac / (lambd * 1e-9)**2. * length * 1e-2
-            for length in track_lengths]
+        diff_counts = np.array([
+            prefac / (lambd * 1e-9)**2. * track_length * 1e-2
             for lambd in wavelengths
         ])
         return diff_counts * 1e-9 / np.pi

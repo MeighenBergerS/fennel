@@ -47,6 +47,8 @@ class Track(object):
         ValueError
             Other distribution type for emission angles is not implemented
         """
+        if not config["general"]["enable logging"]:
+            _log.disabled = True
         _log.debug('Constructing a track object')
         self._medium = config["scenario"]["medium"]
         self._n = config["mediums"][self._medium]["refractive index"]

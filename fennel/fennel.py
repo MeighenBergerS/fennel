@@ -95,6 +95,8 @@ class Fennel(object):
             fh.setLevel(logging.DEBUG)
             fh.setFormatter(formatter_with_name)
             _log.addHandler(fh)
+        else:
+            _log.disabled = True
         # console logger with a higher log level
         ch = logging.StreamHandler(sys.stdout)
         ch.setLevel(config["general"]["debug level"])

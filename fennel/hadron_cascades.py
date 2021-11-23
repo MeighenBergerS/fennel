@@ -54,6 +54,8 @@ class Hadron_Cascade(object):
         ValueError
             File containing the muon production data was not found
         """
+        if not config["general"]["enable logging"]:
+            _log.disabled = True
         _log.debug('Constructing a hadron cascade object')
         self._medium = config["mediums"][config["scenario"]["medium"]]
         self._n = self._medium["refractive index"]
@@ -109,14 +111,14 @@ class Hadron_Cascade(object):
     ###########################################################################
     # Numpy
     def _track_lengths_fetcher(
-            self, E, particle: Particle):
+            self, E, particle: int):
         """ Parametrization for the energy dependence of the tracks
 
         Parameters
         ----------
         E : float/np.array
             The energy of interest in GeV
-        particle : Particle
+        particle : int
             The particle of interest
 
         Returns
@@ -126,7 +128,7 @@ class Hadron_Cascade(object):
         track_length_dev : np.array
             The track lengths deviations for different energies
         """
-        params = config["hadron cascade"]["track parameters"][particle._name]
+        params = config["hadron cascade"]["track parameters"][particle]
         alpha = params["alpha"]
         beta = params["beta"]
         alpha_dev = params["alpha dev"]
@@ -135,14 +137,14 @@ class Hadron_Cascade(object):
         track_length_dev = alpha_dev * E**beta_dev
         return track_length, track_length_dev
 
-    def _em_fraction_fetcher(self, E, particle: Particle):
+    def _em_fraction_fetcher(self, E, particle: int):
         """ Parametrization of the EM contribution in a hadronic shower
 
         Parameters
         ----------
         E : float/np.array
             The energy of interest in GeV
-        particle : Particle
+        particle : int
             The particle of interest
 
         Returns
@@ -152,7 +154,7 @@ class Hadron_Cascade(object):
         em_fraction_sd : np.array
             The standard deviation
         """
-        params = config["hadron cascade"]["em fraction"][particle._name]
+        params = config["hadron cascade"]["em fraction"][particle]
         Es = params["Es"]
         f0 = params["f0"]
         m = params["m"]
@@ -194,7 +196,7 @@ class Hadron_Cascade(object):
         ])
         return res
 
-    def _a_energy_fetcher(self, E: float, particle: Particle) -> np.array:
+    def _a_energy_fetcher(self, E: float, particle: int) -> np.array:
         """ Parametrizes the energy dependence of the a parameter for the
         longitudinal profiles
 
@@ -202,7 +204,7 @@ class Hadron_Cascade(object):
         ----------
         E : float
             The energy of interest in GeV
-        particle : Particle
+        particle : int
             The particle of interest
 
         Returns
@@ -211,13 +213,13 @@ class Hadron_Cascade(object):
             The values for the energies of interest
         """
         params = config["hadron cascade"]["longitudinal parameters"][
-            particle._name]
+            particle]
         alpha = params["alpha"]
         beta = params["beta"]
         a = alpha + beta * np.log10(E)
         return a
 
-    def _b_energy_fetcher(self, particle: Particle) -> np.array:
+    def _b_energy_fetcher(self, particle: int) -> np.array:
         """ Parametrizes the energy dependence of the b parameter for the
         longitudinal profiles. Currently assumed to be constant
 
@@ -225,7 +227,7 @@ class Hadron_Cascade(object):
         ----------
         E : float
             The energy of interest in GeV
-        particle : Particle
+        particle : int
             The particle of interest
 
         Returns
@@ -234,7 +236,7 @@ class Hadron_Cascade(object):
             The values for the energies of interest
         """
         params = config["hadron cascade"]["longitudinal parameters"][
-            particle._name]
+            particle]
         b = params["b"]
         return b
 
@@ -275,7 +277,7 @@ class Hadron_Cascade(object):
         return np.nan_to_num(distro)
 
     def _energy_dependence_angle_pars(
-            self, E, particle: Particle):
+            self, E, particle: int):
         """ Parametrizes the energy dependence of the angular distribution
         parameters
 
@@ -299,7 +301,7 @@ class Hadron_Cascade(object):
         """
         params = config[
             "hadron cascade"
-        ]["angular distribution"][particle._name]
+        ]["angular distribution"][particle]
         a_pars = params["a pars"]
         b_pars = params["b pars"]
         c_pars = params["c pars"]
