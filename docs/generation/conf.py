@@ -12,7 +12,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('../../'))
 
 
 # -- Project information -----------------------------------------------------
@@ -22,7 +22,7 @@ copyright = '2021, Stephan Meighen-Berger'
 author = 'Stephan Meighen-Berger'
 
 # The full version, including alpha/beta/rc tags
-release = 'v1.0.0'
+release = 'v1.1.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -61,3 +61,6 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# Autodoc
+autodoc_default_options = {"members": True, "undoc-members": True, "private-members": True}
