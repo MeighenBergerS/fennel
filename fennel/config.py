@@ -162,19 +162,19 @@ _baseconfig = {
     # TODO: Move this to a seperate data file
     "em cascade": {
         "track parameters": {
-            "e-": {
+            11: {
                 "alpha": 532.07078881,  # cm GeV^-1
                 "beta": 1.00000211,
                 "alpha dev": 5.78170887,
                 "beta dev": 0.5
             },
-            "e+": {
+            -11: {
                 "alpha": 532.11320598,  # cm GeV^-1
                 "beta": 0.99999254,
                 "alpha dev": 5.73419669,
                 "beta dev": 0.5
             },
-            "gamma": {
+            22: {
                 "alpha": 532.08540905,  # cm GeV^-1
                 "beta": 0.99999877,
                 "alpha dev": 5.78170887,
@@ -182,36 +182,36 @@ _baseconfig = {
             },
         },
         "longitudinal parameters": {
-            "e-": {
+            11: {
                 "alpha": 2.01849,
                 "beta": 1.45469,
                 "b": 0.63207
             },
-            "e+": {
+            -11: {
                 "alpha": 2.00035,
                 "beta": 1.45501,
                 "b": 0.63008
             },
-            "gamma": {
+            22: {
                 "alpha": 2.83923,
                 "beta": 1.34031,
                 "b": 0.64526
             },
         },
         "angular distribution": {
-            "e-": {
+            11: {
                 "a": 4.27033,  # sr^-1
                 "b": -6.02527,
                 "c": 0.29887,
                 "d": -0.00103,  # sr^-1
             },
-            "e+": {
+            -11: {
                 "a": 4.27725,  # sr^-1
                 "b": -6.02430,
                 "c": 0.29856,
                 "d": -0.00104,  # sr^-1
             },
-            "gamma": {
+            22: {
                 "a": 4.25716,  # sr^-1
                 "b": -6.02421,
                 "c": 0.29926,
@@ -225,37 +225,37 @@ _baseconfig = {
     # TODO: Move this to a seperate data file
     "hadron cascade": {
         "track parameters": {
-            "pi+": {
+            211: {
                 "alpha": 333.55182722,  # cm GeV^-1
                 "beta": 1.03662217,
                 "alpha dev": 119.20455395,
                 "beta dev": 0.80772057
             },
-            "pi-": {
+            -211: {
                 "alpha": 335.84489578,  # cm GeV^-1
                 "beta": 1.03584394,
                 "alpha dev": 122.50188073,
                 "beta dev": 0.80322520
             },
-            "KL0": {
+            130: {
                 "alpha": 326.00450524,  # cm GeV^-1
                 "beta": 1.03931457,
                 "alpha dev": 121.41970572,
                 "beta dev": 0.80779629
             },
-            "p+": {
+            2212: {
                 "alpha": 287.37183922,  # cm GeV^-1
                 "beta": 1.05172118,
                 "alpha dev": 88.04581378,
                 "beta dev": 0.82445572
             },
-            "p-": {
+            -2212: {
                 "alpha": 303.33074914,  # cm GeV^-1
                 "beta": 1.04322206,
                 "alpha dev": 113.23088104,
                 "beta dev": 0.77134060
             },
-            "n": {
+            2112: {
                 "alpha": 278.43854660,  # cm GeV^-1
                 "beta": 1.05582906,
                 "alpha dev": 93.22787137,
@@ -263,42 +263,42 @@ _baseconfig = {
             },
         },
         "em fraction": {
-            "pi+": {
+            211: {
                 "Es": 0.15591,  # GeV
                 "f0": 0.27273,
                 "m": 0.15782,
                 "sigma0": 0.40626,
                 "gamma": 1.01771,
             },
-            "pi-": {
+            -211: {
                 "Es": 0.13397,  # GeV
                 "f0": 0.28735,
                 "m": 0.15341,
                 "sigma0": 0.43354,
                 "gamma": 1.05561,
             },
-            "KL0": {
+            130: {
                 "Es": 0.21684,  # GeV
                 "f0": 0.26987,
                 "m": 0.16365,
                 "sigma0": 0.37875,
                 "gamma": 0.97048,
             },
-            "p+": {
+            2212: {
                 "Es": 0.31944,  # GeV
                 "f0": 0.10871,
                 "m": 0.17921,
                 "sigma0": 0.28550,
                 "gamma": 0.93413,
             },
-            "p-": {
+            -2212: {
                 "Es": 0.31944,  # GeV
                 "f0": 0.10871,
                 "m": 0.17921,
                 "sigma0": 0.47001,
                 "gamma": 1.25674,
             },
-            "n": {
+            2112: {
                 "Es": 0.25998,  # GeV
                 "f0": 0.02775,
                 "m": 0.18505,
@@ -307,69 +307,69 @@ _baseconfig = {
             },
         },
         "longitudinal parameters": {
-            "pi+": {
+            211: {
                 "alpha": 1.81098,
                 "beta": 0.90572,
                 "b": 0.34347,
             },
-            "pi-": {
+            -211: {
                 "alpha": 1.81430,
                 "beta": 0.90165,
                 "b": 0.34131,
             },
-            "KL0": {
+            130: {
                 "alpha": 1.99751,
                 "beta": 0.80628,
                 "b": 0.35027,
             },
-            "p+": {
+            2212: {
                 "alpha": 1.62345,
                 "beta": 0.90875,
                 "b": 0.35871,
             },
-            "p-": {
+            -2212: {
                 "alpha": 1.88676,
                 "beta": 0.78825,
                 "b": 0.35063,
             },
-            "n": {
+            2112: {
                 "alpha": 1.78137,
                 "beta": 0.87687,
                 "b": 0.35473,
             },
         },
         "angular distribution": {
-            "pi+": {
+            211: {
                 "a pars": [0.25877, 1.05372],  # sr^-1
                 "b pars": [-3.34355, 0.22303],
                 "c pars": [0.70633, -0.34407],
                 "d pars": [0.08572, -1.90632],  # sr^-1
             },
-            "pi-": {
+            -211: {
                 "a pars": [0.25915, 1.05539],  # sr^-1
                 "b pars": [-3.29885, 0.22989],
                 "c pars": [0.71082, -0.34857],
                 "d pars": [0.11207, -2.05247],  # sr^-1
             },
-            "KL0": {
+            130: {
                 "a pars": [0.25015, 1.06819],  # sr^-1
                 "b pars": [-3.33393, 0.22403],
                 "c pars": [0.76039, -0.38042],
                 "d pars": [0.14898, -2.19057],  # sr^-1
             },
-            "p+": {
+            2212: {
                 "a pars": [0.13966, 1.30159],  # sr^-1
                 "b pars": [-2.82378, 0.29381],
                 "c pars": [0.91092, -0.45380],
                 "d pars": [0.13845, -2.02526],  # sr^-1
             },
-            "p-": {
+            -2212: {
                 "a pars": [0.08111, 1.52203],  # sr^-1
                 "b pars": [-2.47748, 0.34737],
                 "c pars": [1.16940, -0.56291],
                 "d pars": [0.18410, -2.07564],  # sr^-1
             },
-            "n": {
+            2112: {
                 "a pars": [0.11829, 1.37902],  # sr^-1
                 "b pars": [-2.75135, 0.30581],
                 "c pars": [0.99563, -0.49587],
@@ -387,7 +387,7 @@ _baseconfig = {
         "fine structure": 0.0072973525693,
         "particle charge": 1.,  # Charge of the particle of interest
         "wavelengths": np.linspace(350., 500., 100),  # in nm
-        "track lengths": np.logspace(-3, 1, 41),  # in m
+        "track length": 1.,  # in cm
         "angles": np.linspace(0., 180., 100),  # in degrees
         # The grid used for long profiling. Given in cm
         "z grid": np.linspace(0., 1e4, int(1e4)),

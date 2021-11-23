@@ -20,6 +20,8 @@ from .tracks import Track
 from .em_cascades import EM_Cascade
 from .hadron_cascades import Hadron_Cascade
 from .photons import Photon
+if config["general"]["jax"]:
+    from jax.random import PRNGKey
 
 # unless we put this class in __init__, __name__ will be contagion.contagion
 _log = logging.getLogger("fennel")
@@ -64,11 +66,17 @@ class Fennel(object):
         # Create RandomState
         if config["general"]["random state seed"] is None:
             _log.warning("No random state seed given, constructing new state")
-            rstate = np.random.RandomState()
+            if config["general"]["jax"]:
+                rstate = PRNGKey(1337)
+            else:
+                rstate = np.random.RandomState()
         else:
-            rstate = np.random.RandomState(
-                config["general"]["random state seed"]
-            )
+            if config["general"]["jax"]:
+                rstate = PRNGKey(config["general"]["random state seed"])
+            else:
+                rstate = np.random.RandomState(
+                    config["general"]["random state seed"]
+                )
         config["runtime"] = {"random state": rstate}
 
         # Logger
@@ -136,9 +144,6 @@ class Fennel(object):
         _log.info('Creation finished')
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
-        _log.info('To run the simulation use the sim method')
-        _log.info('---------------------------------------------------')
-        _log.info('---------------------------------------------------')
 
     def close(self):
         """ Wraps up the program
@@ -176,61 +181,88 @@ class Fennel(object):
 
     def track_yields(
             self,
-            energy: float, deltaL: float, interaction='total',
+            energy: float,
+            wavelengths=config["advanced"]["wavelengths"],
+            angle_grid=config["advanced"]["angles"],
+            n=config["mediums"][
+                config["scenario"]["medium"]]["refractive index"],
+            interaction='total',
             function=False):
-        """ Fetcher function for a specific particle and energy. This is for
-        tracks and currently only for muons and symmetric distros
+        """ Fetcher function for a specific energy and wavelength. This is for
+        tracks and currently only for muons. Note in JAX mode the functions
+        only take scalars!
 
         Parameters
         ----------
         energy : float
-            The energy of the particle
-        deltaL : float
-            The step size for the current track length in cm
+            The energy(ies) of the particle in GeV
+        wavelengths : np.array
+            Optional: The desired wavelengths
+        angle_grid : np.array
+            Optional: The desired angles
+        n : float
+            The refractive index of the medium.
         interaction : str
-            Optional: The interaction(s) which should produce the light
+            Optional: The interaction which should produce the light
         function : bool
             returns the functional form instead of the evaluation
 
         Returns
         -------
-        counts : float/function
-            The photon counts
+        differential_counts : np.array/function
+            dN/dlambda The differential photon counts per track length (in cm).
+            The shape of the array is len(wavelengths).
         angles : np.array/function
-            The angular distribution
+            The angular distribution in degrees
         """
         return self._photon._track_fetcher(
-            energy, deltaL, interaction, function
+            energy, wavelengths, angle_grid, n, interaction, function
         )
 
     def em_yields(
-            self, energy: float, particle: int,
-            mean=True, function=False):
+            self, energy,
+            particle: int,
+            wavelengths=config["advanced"]["wavelengths"],
+            angle_grid=config["advanced"]["angles"],
+            n=config["mediums"][
+                config["scenario"]["medium"]]["refractive index"],
+            z_grid=config["advanced"]["z grid"],
+            function=False):
         """ Fetcher function for a specific particle and energy. This is for
-        em cascades and currently only symmetric distros
+        em cascades.
 
-        Parameters
+       Parameters
         ----------
         energy : float
-            The energy of the particle
+            The energy(ies) of the particle in GeV
         particle : int
-            The particle of interest with its pdg id
-        mean : bool
-            Optional: Switch to use either the mean value or a sample
+            The pdg id of the particle of interest
+        wavelengths : np.array
+            Optional: The desired wavelengths
+        angle_grid : np.array
+            Optional: The desired angles in degress
+        n : float
+            Optional: The refractive index of the medium.
+        z_grid : np.array
+            Optional: The grid in cm for the long. distributions
         function : bool
-            Optional: Switches between the functional and explicit forms
+            Optional: returns the functional form instead of the evaluation
 
         Returns
         -------
-        counts : float
-            The photon counts
-        long_profile : np.array
-            The distribution along the shower axis
-        angles : np.array
-            The angular distribution
+        differential_counts : function/float/np.array
+            dN/dlambda The differential photon counts per track length (in cm).
+            The shape of the array is (len(wavelengths), len(deltaL)).
+        differential_counts_sample : float/np.array
+            A sample of the differential counts distribution. Same shape as
+            the differential counts
+        long_profile : function/float/np.array
+            The distribution along the shower axis for cm
+        angles : function/float/np.array
+            The angular distribution in degrees
         """
         return self._photon._em_cascade_fetcher(
-            energy, particle, mean, function
+            energy, particle, wavelengths, angle_grid, n, z_grid, function
         )
 
     def hadron_yields(

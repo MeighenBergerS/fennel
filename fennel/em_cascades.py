@@ -7,7 +7,6 @@ import logging
 import numpy as np
 from scipy.special import gamma as gamma_func
 from .config import config
-from .particle import Particle
 if config["general"]["jax"]:
     import jax.numpy as jnp
     from jax.scipy.stats import gamma as jax_gamma
@@ -50,7 +49,7 @@ class EM_Cascade(object):
         self._n = self._medium["refractive index"]
         self._radlength = self._medium["radiation length"]
         self._Lrad = self._radlength / self._medium["density"]
-        if config["general"]["JAX"]:
+        if config["general"]["jax"]:
             _log.info("Running with JAX functions")
             self.cherenkov_angle_distro = self._symmetric_angle_distro_jax
             self.track_lengths = self._track_lengths_fetcher_jax
@@ -64,7 +63,7 @@ class EM_Cascade(object):
     ###########################################################################
     # Numpy
     def _track_lengths_fetcher(
-            self, E, particle: Particle):
+            self, E, name: int):
         """ Parametrization for the energy dependence of the tracks. This is
         the fetcher function for a single energy
 
@@ -72,7 +71,7 @@ class EM_Cascade(object):
         ----------
         E : float/np.array
             The energy of interest
-        particle : Particle
+        name : int
             The particle of interest
 
         Returns
@@ -82,7 +81,7 @@ class EM_Cascade(object):
         track_length_dev : np.array
             The track lengths deviations for different energies
         """
-        params = config["em cascade"]["track parameters"][particle._name]
+        params = config["em cascade"]["track parameters"][name]
         alpha = params["alpha"]
         beta = params["beta"]
         alpha_dev = params["alpha dev"]
@@ -92,7 +91,7 @@ class EM_Cascade(object):
         return track_length, track_length_dev
 
     def _log_profile_func_fetcher(
-            self, E, z: np.array, particle: Particle,
+            self, E, z: np.array, name: int,
             ) -> np.array:
         """ Parametrization of the longitudinal profile for a single energy.
         This still needs work
@@ -103,7 +102,7 @@ class EM_Cascade(object):
             The energy in GeV
         z : np.array
             The cascade depth in cm
-        particle : Particle
+        name : int
             The particle of interest
 
         Returns
@@ -113,8 +112,8 @@ class EM_Cascade(object):
             cm defined along the first axis and energies along the second
         """
         t = z / self._Lrad
-        b = self._b_energy_fetch(particle)
-        a = self._a_energy_fetch(E, particle)
+        b = self._b_energy_fetch(name)
+        a = self._a_energy_fetch(E, name)
         a = np.array(a).flatten()
         res = np.array([
             b * (
@@ -123,7 +122,7 @@ class EM_Cascade(object):
         ])
         return res
 
-    def _a_energy_fetch(self, E: float, particle: Particle) -> np.array:
+    def _a_energy_fetch(self, E: float, name: int) -> np.array:
         """ Parametrizes the energy dependence of the a parameter for the
         longitudinal profiles. This is for a single energy.
 
@@ -131,7 +130,7 @@ class EM_Cascade(object):
         ----------
         E : float
             The energy in GeV
-        particle : Particle
+        name : int
             The particle of interest
 
         Returns
@@ -140,20 +139,20 @@ class EM_Cascade(object):
             The values for the energies of interest
         """
         params = config["em cascade"]["longitudinal parameters"][
-            particle._name]
+            name]
         alpha = params["alpha"]
         beta = params["beta"]
         a = alpha + beta * np.log10(E)
         return a
 
-    def _b_energy_fetch(self, particle: Particle) -> np.array:
+    def _b_energy_fetch(self, name: int) -> np.array:
         """ Parametrizes the energy dependence of the b parameter for the
         longitudinal profiles. Currently assumed to be constant.
         This is for a single energy.
 
         Parameters
         ----------
-        particle : Particle
+        name : int
             The particle of interest
 
         Returns
@@ -162,14 +161,14 @@ class EM_Cascade(object):
             The values for the energies of interest
         """
         params = config["em cascade"]["longitudinal parameters"][
-            particle._name]
+            name]
         b = params["b"]
         return b
 
     def _symmetric_angle_distro(
             self,
             phi: np.array, n: float,
-            particle: Particle) -> np.array:
+            name: int) -> np.array:
         # TODO: Add asymmetry function
         # TODO: Add changes with shower depth
         """ Calculates the symmetric angular distribution of the Cherenkov
@@ -181,7 +180,7 @@ class EM_Cascade(object):
             The angles of interest in degrees
         n : float
             The refractive index
-        particle : Particle
+        name : int
             The particle of interest
 
         Returns
@@ -189,7 +188,7 @@ class EM_Cascade(object):
         distro : np.array
             The distribution of emitted photons given the angle
         """
-        params = config["em cascade"]["angular distribution"][particle._name]
+        params = config["em cascade"]["angular distribution"][name]
         a = params["a"]
         b = params["b"]
         c = params["c"]
@@ -202,7 +201,7 @@ class EM_Cascade(object):
     ###########################################################################
     # JAX
     def _track_lengths_fetcher_jax(
-            self, E: float, particle: Particle):
+            self, E: float, name: int):
         """ Parametrization for the energy dependence of the tracks. This is
         the fetcher function for a single energy. JAX implementation
 
@@ -210,7 +209,7 @@ class EM_Cascade(object):
         ----------
         E : float
             The energy of interest
-        particle : Particle
+        name : int
             The particle of interest
 
         Returns
@@ -220,7 +219,7 @@ class EM_Cascade(object):
         track_length_dev : float
             The track lengths deviations for different energies
         """
-        params = config["em cascade"]["track parameters"][particle._name]
+        params = config["em cascade"]["track parameters"][name]
         alpha = params["alpha"]
         beta = params["beta"]
         alpha_dev = params["alpha dev"]
@@ -230,7 +229,7 @@ class EM_Cascade(object):
         return track_length, track_length_dev
 
     def _log_profile_func_fetcher_jax(
-            self, E: float, z: float, particle: Particle,
+            self, E: float, z: float, name: int,
             ) -> float:
         """ Parametrization of the longitudinal profile for a single energy.
         This still needs work. JAX implementation
@@ -241,7 +240,7 @@ class EM_Cascade(object):
             The energy in GeV
         z : float
             The cascade depth in cm
-        particle : Particle
+        name : int
             The particle of interest
 
         Returns
@@ -250,12 +249,12 @@ class EM_Cascade(object):
             Is equal to l^(-1) * dl/dt
         """
         t = z / self._Lrad
-        b = self._b_energy_fetch_jax(particle)
-        a = self._a_energy_fetch_jax(E, particle)
+        b = self._b_energy_fetch_jax(name)
+        a = self._a_energy_fetch_jax(E, name)
         res = jax_gamma.pdf(t * b, a) * b
         return res
 
-    def _a_energy_fetch_jax(self, E: float, particle: Particle) -> float:
+    def _a_energy_fetch_jax(self, E: float, name: int) -> float:
         """ Parametrizes the energy dependence of the a parameter for the
         longitudinal profiles. This is for a single energy.
 
@@ -263,7 +262,7 @@ class EM_Cascade(object):
         ----------
         E : float
             The energy in GeV
-        particle : Particle
+        name : int
             The particle of interest
 
         Returns
@@ -272,13 +271,13 @@ class EM_Cascade(object):
             The values for the energies of interest
         """
         params = config["em cascade"]["longitudinal parameters"][
-            particle._name]
+            name]
         alpha = params["alpha"]
         beta = params["beta"]
         a = alpha + beta * jnp.log10(E)
         return a
 
-    def _b_energy_fetch_jax(self, particle: Particle) -> float:
+    def _b_energy_fetch_jax(self, name: int) -> float:
         """ Parametrizes the energy dependence of the b parameter for the
         longitudinal profiles. Currently assumed to be constant.
         This is for a single energy.
@@ -294,14 +293,14 @@ class EM_Cascade(object):
             The values for the energies of interest
         """
         params = config["em cascade"]["longitudinal parameters"][
-            particle._name]
+            name]
         b = params["b"]
         return b
 
     def _symmetric_angle_distro_jax(
             self,
             phi: float, n: float,
-            particle: Particle) -> float:
+            name: int) -> float:
         # TODO: Add asymmetry function
         # TODO: Add changes with shower depth
         """ Calculates the symmetric angular distribution of the Cherenkov
@@ -313,7 +312,7 @@ class EM_Cascade(object):
             The angles of interest in degrees
         n : float
             The refractive index
-        particle : Particle
+        name : int
             The particle of interest
 
         Returns
@@ -321,7 +320,7 @@ class EM_Cascade(object):
         distro : float
             The distribution of emitted photons given the angle
         """
-        params = config["em cascade"]["angular distribution"][particle._name]
+        params = config["em cascade"]["angular distribution"][name]
         a = params["a"]
         b = params["b"]
         c = params["c"]
