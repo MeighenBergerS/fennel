@@ -12,7 +12,7 @@ try:
     from jax.scipy.stats import gamma as jax_gamma
 except ImportError:
     if config["general"]["jax"]:
-        ImportError("Jax not found!")
+        raise ImportError("Jax not found!")
 
 _log = logging.getLogger(__name__)
 
@@ -44,8 +44,7 @@ class EM_Cascade(object):
 
         Raises
         ------
-        ValueError
-            Other distribution type for emission angles is not implemented
+        None
         """
         if not config["general"]["enable logging"]:
             _log.disabled = True

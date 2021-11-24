@@ -67,7 +67,7 @@ class Hadron_Cascade(object):
                     __name__, "data/muon_production.pkl"
             )
             if muon_data is None:
-                ValueError("Muon production data not found!")
+                raise ValueError("Muon production data not found!")
             self.__muon_prod_dict = pickle.loads(muon_data)
             _log.debug("Constructing spline dictionary")
             self.__muon_prod_spl_pars = {}
@@ -90,9 +90,9 @@ class Hadron_Cascade(object):
                     )
                 }
         else:
-            ValueError("Hadronic parametrization " +
-                       config["scenario"]["parametrization"] +
-                       " not implemented!")
+            raise ValueError("Hadronic parametrization " +
+                             config["scenario"]["parametrization"] +
+                             " not implemented!")
         if config["general"]["jax"]:
             _log.info("Running with JAX functions")
             self.cherenkov_angle_distro = self._symmetric_angle_distro_jax

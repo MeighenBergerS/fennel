@@ -6,5 +6,5 @@ from .config import config
 __all__ = (Fennel, config)
 
 # Version of the fennel package
-__version__ = "1.0.0"
+__version__ = "1.1.1"
 __author__ = "Stephan Meighen-Berger"

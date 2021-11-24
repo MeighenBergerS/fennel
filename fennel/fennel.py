@@ -24,7 +24,7 @@ try:
     from jax.random import PRNGKey
 except ImportError:
     if config["general"]["jax"]:
-        ImportError("Jax not found!")
+        raise ImportError("Jax not found!")
 
 # unless we put this class in __init__, __name__ will be contagion.contagion
 _log = logging.getLogger("fennel")
@@ -175,14 +175,137 @@ class Fennel(object):
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
         _log.info("Have a great day and until next time!")
-        _log.info('          /"*._         _')
-        _log.info("      .-*'`    `*-.._.-'/")
-        _log.info('    < * ))     ,       ( ')
-        _log.info("     `*-._`._(__.--*.---. ")
+        _log.info("                  @*****&@         @@.                    ")
+        _log.info("           @@@((@ @*******@     @%((((@@((@               ")
+        _log.info("         @(((((((@(@*******@@@((@(((((((((@*              ")
+        _log.info("        @((((((@(((@*******@(((@%(((((&%(((@              ")
+        _log.info("         #@((@((&@((&*******@((@(((((@#(((@               ")
+        _log.info("        @@*****@((#@@********@@(((((@(((@/**@@            ")
+        _log.info("        @********@((@@*************@@@#@******&%          ")
+        _log.info("@@  @ @&(@(***,*******,*******,*******,*******,@      .@@*")
+        _log.info(" @   @@((((@*************.*********...*******@(@      ./  ")
+        _log.info(" @     %(((#@**********...*,.. ........**,**(@(#*     @   ")
+        _log.info("  @      @@,.*.***,@@@.......*,...@@@..*,.....@@    &@    ")
+        _log.info("   @(    @....,,...@@......... ,*.@%...*......,%  @@      ")
+        _log.info("       @@@.....,***...............,****.......*@,         ")
+        _log.info("        .........*............ ........****..*.@          ")
+        _log.info("         #*........*...&       @...............@          ")
+        _log.info("         @ *.. ... ..,,..@@@@. ... ... ... ...&           ")
+        _log.info("          @.,*...........*,...................@           ")
+        _log.info("            @.**.............*,..............@            ")
+        _log.info("             .@.**...............**.........@             ")
+        _log.info("           @@@%   &@@,........ .......**#@    @@          ")
+        _log.info("        @,                 (@@@@@@@@(             @       ")
+        _log.info("                                                %@*       ")
         _log.info('---------------------------------------------------')
         _log.info('---------------------------------------------------')
         # Closing log
         logging.shutdown()
+
+    def auto_yields(
+            self, energy,
+            particle: int,
+            interaction='total',
+            wavelengths=config["advanced"]["wavelengths"],
+            angle_grid=config["advanced"]["angles"],
+            n=config["mediums"][
+                config["scenario"]["medium"]]["refractive index"],
+            z_grid=config["advanced"]["z grid"],
+            function=False):
+        """ Auto fetcher function for a given particle and energy. This will
+        fetch/evaluate the functions corresponding to the given particle.
+        Some of the output will be none depending on the constructed object
+
+        Parameters
+        ----------
+        energy : float
+            The energy(ies) of the particle in GeV
+        particle : int
+            The pdg id of the particle of interest
+        wavelengths : np.array
+            Optional: The desired wavelengths
+        interaction : str
+            Optional: The interaction which should produce the light.
+            This is used during track construction.
+        angle_grid : np.array
+            Optional: The desired angles in degress
+        n : float
+            Optional: The refractive index of the medium.
+        z_grid : np.array
+            Optional: The grid in cm for the long. distributions.
+            Used when modeling cascades.
+        function : bool
+            Optional: returns the functional form instead of the evaluation
+
+        Returns
+        -------
+        differential_counts : function/float/np.array
+            dN/dlambda The differential photon counts per track length (in cm).
+            The shape of the array is (len(wavelengths), len(deltaL)).
+        differential_counts_sample : float/np.array
+            A sample of the differential counts distribution. Same shape as
+            the differential counts
+        em_fraction_mean : float/np.array
+            The fraction of em particles
+        em_fraction_sample : float/np.array
+            A sample of the em_fraction
+        long_profile : function/float/np.array
+            The distribution along the shower axis for cm
+        angles : function/float/np.array
+            The angular distribution in degrees
+        """
+        if particle in config["simulation"]["track particles"]:
+            _log.debug("Fetching/evaluating track functions for " +
+                       str(particle))
+            dcounts, angles = self.track_yields(
+                energy,
+                wavelengths=wavelengths,
+                angle_grid=angle_grid,
+                n=n,
+                interaction=interaction,
+                function=function
+            )
+            # Unfilled variables
+            dcounts_s = None
+            em_frac = None
+            em_frac_s = None
+            long = None
+        elif particle in config["simulation"]["em particles"]:
+            _log.debug("Fetching/evaluating em functions for " +
+                       str(particle))
+            dcounts, dcounts_s, long, angles = self.em_yields(
+                energy,
+                particle,
+                wavelengths=wavelengths,
+                angle_grid=angle_grid,
+                n=n,
+                z_grid=z_grid,
+                function=function
+            )
+            # Unfilled variables
+            em_frac = None
+            em_frac_s = None
+        elif particle in config["simulation"]["hadron particles"]:
+            _log.debug("Fetching/evaluating hadron functions for " +
+                       str(particle))
+            dcounts, dcounts_s, em_frac, em_frac_s, long, angles = (
+                self.hadron_yields(
+                    energy,
+                    particle,
+                    wavelengths=wavelengths,
+                    angle_grid=angle_grid,
+                    n=n,
+                    z_grid=z_grid,
+                    function=function
+                )
+            )
+        else:
+            raise ValueError(
+                "Track/cascade object corresponding to " +
+                str(particle) + " is unknown. Please contact " +
+                "the authors if there is a need for this species"
+            )
+        return dcounts, dcounts_s, em_frac, em_frac_s, long, angles
 
     def track_yields(
             self,
@@ -236,7 +359,7 @@ class Fennel(object):
         """ Fetcher function for a specific particle and energy. This is for
         em cascades.
 
-       Parameters
+        Parameters
         ----------
         energy : float
             The energy(ies) of the particle in GeV
@@ -282,7 +405,7 @@ class Fennel(object):
         """ Fetcher function for a specific particle and energy. This is for
         hadron cascades.
 
-       Parameters
+        Parameters
         ----------
         energy : float
             The energy(ies) of the particle in GeV
@@ -307,6 +430,10 @@ class Fennel(object):
         differential_counts_sample : float/np.array
             A sample of the differential counts distribution. Same shape as
             the differential counts
+        em_fraction_mean : float/np.array
+            The fraction of em particles
+        em_fraction_sample : float/np.array
+            A sample of the em_fraction
         long_profile : function/float/np.array
             The distribution along the shower axis for cm
         angles : function/float/np.array
@@ -315,3 +442,29 @@ class Fennel(object):
         return self._photon._hadron_cascade_fetcher(
             energy, particle, wavelengths, angle_grid, n, z_grid, function
         )
+
+    def hidden_function(self):
+        """ Yaha! You found me!
+        """
+        print("                  @*****&@         @@.                    ")
+        print("           @@@((@ @*******@     @%((((@@((@               ")
+        print("         @(((((((@(@*******@@@((@(((((((((@*              ")
+        print("        @((((((@(((@*******@(((@%(((((&%(((@              ")
+        print("         #@((@((&@((&*******@((@(((((@#(((@               ")
+        print("        @@*****@((#@@********@@(((((@(((@/**@@            ")
+        print("        @********@((@@*************@@@#@******&%          ")
+        print("@@  @ @&(@(***,*******,*******,*******,*******,@      .@@*")
+        print(" @   @@((((@*************.*********...*******@(@      ./  ")
+        print(" @     %(((#@**********...*,.. ........**,**(@(#*     @   ")
+        print("  @      @@,.*.***,@@@.......*,...@@@..*,.....@@    &@    ")
+        print("   @(    @....,,...@@......... ,*.@%...*......,%  @@      ")
+        print("       @@@.....,***...............,****.......*@,         ")
+        print("        .........*............ ........****..*.@          ")
+        print("         #*........*...&       @...............@          ")
+        print("         @ *.. ... ..,,..@@@@. ... ... ... ...&           ")
+        print("          @.,*...........*,...................@           ")
+        print("            @.**.............*,..............@            ")
+        print("             .@.**...............**.........@             ")
+        print("           @@@%   &@@,........ .......**#@    @@          ")
+        print("        @,                 (@@@@@@@@(             @       ")
+        print("                                                %@*       ")

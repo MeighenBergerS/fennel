@@ -11,7 +11,7 @@ try:
     import jax.numpy as jnp
 except ImportError:
     if config["general"]["jax"]:
-        ImportError("Jax not found!")
+        raise ImportError("Jax not found!")
 
 
 _log = logging.getLogger(__name__)
@@ -44,8 +44,7 @@ class Track(object):
 
         Raises
         ------
-        ValueError
-            Other distribution type for emission angles is not implemented
+        None
         """
         if not config["general"]["enable logging"]:
             _log.disabled = True

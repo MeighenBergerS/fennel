@@ -15,7 +15,7 @@ try:
     from jax.random import normal as jnormal
 except ImportError:
     if config["general"]["jax"]:
-        ImportError("Jax not found!")
+        raise ImportError("Jax not found!")
 
 
 _log = logging.getLogger(__name__)
@@ -297,6 +297,10 @@ class Photon(object):
         differential_counts_sample : float/np.array
             A sample of the differential counts distribution. Same shape as
             the differential counts
+        em_fraction_mean : float/np.array
+            The fraction of em particles
+        em_fraction_sample : float/np.array
+            A sample of the em_fraction
         long_profile : function/float/np.array
             The distribution along the shower axis for cm
         angles : function/float/np.array

@@ -63,4 +63,9 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # Autodoc
-autodoc_default_options = {"members": True, "undoc-members": True, "private-members": True}
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "private-members": True
+}
+autodoc_preserve_defaults = True
