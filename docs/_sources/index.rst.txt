@@ -12,7 +12,6 @@ fennel.config module
    :undoc-members:
    :show-inheritance:
    :private-members:
-   :special-members:
 
 fennel.em\_cascades module
 --------------------------
@@ -22,7 +21,6 @@ fennel.em\_cascades module
    :undoc-members:
    :show-inheritance:
    :private-members:
-   :special-members:
 
 fennel.fennel module
 --------------------
@@ -32,7 +30,6 @@ fennel.fennel module
    :undoc-members:
    :show-inheritance:
    :private-members:
-   :special-members:
 
 fennel.hadron\_cascades module
 ------------------------------
@@ -42,7 +39,6 @@ fennel.hadron\_cascades module
    :undoc-members:
    :show-inheritance:
    :private-members:
-   :special-members:
 
 fennel.particle module
 ----------------------
@@ -52,7 +48,6 @@ fennel.particle module
    :undoc-members:
    :show-inheritance:
    :private-members:
-   :special-members:
 
 fennel.photons module
 ---------------------
@@ -62,7 +57,6 @@ fennel.photons module
    :undoc-members:
    :show-inheritance:
    :private-members:
-   :special-members:
 
 fennel.tracks module
 --------------------
@@ -72,7 +66,6 @@ fennel.tracks module
    :undoc-members:
    :show-inheritance:
    :private-members:
-   :special-members:
 
 Module contents
 ---------------
@@ -82,4 +75,3 @@ Module contents
    :undoc-members:
    :show-inheritance:
    :private-members:
-   :special-members:
