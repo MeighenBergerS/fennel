@@ -94,4 +94,4 @@ Fennel offers a few subprojects which are currently still in beta. While this pr
 
 1. Jfennel: A Julia implementation of Fennel. This is its own branch in the repository and still requires further work and cross-checks.
 
-2. Seed: An interface to the Geant4 code used for the parametrization. The code itself offers a Python interface for ease of use. To use this code, a Geant4 installation is required. Currently this module has only been tested in a Linux environment.
+2. Seed: An interface to the Geant4 code used for the parametrization. The code itself offers a Python interface for ease of use. To use this code, a Geant4 installation is required. Currently this module has only been tested in a Linux environment. The code itself is contained in the seed folder and includes some examples in the notebooks folder on how to use it.
