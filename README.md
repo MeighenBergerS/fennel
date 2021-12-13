@@ -14,6 +14,8 @@ Authors:
 
 4. [Installation](#installation)
 
+5. [Beta](#beta)
+
 ## Introduction <a name="introduction"></a>
 
 Welcome to Fennel!
@@ -86,3 +88,10 @@ Install using pip:
 ```python
 pip install fennel_seed[interactive]
 ```
+
+## Beta <a name="beta"></a>
+Fennel offers a few subprojects which are currently still in beta. While this projects work, they have as of yet not been designed for usability. Currently available subprojects are available offer the GitHub repository (not pip!). Subprojects are:
+
+1. Jfennel: A Julia implementation of Fennel. This is its own branch in the repository and still requires further work and cross-checks.
+
+2. Seed: An interface to the Geant4 code used for the parametrization. The code itself offers a Python interface for ease of use. To use this code, a Geant4 installation is required. Currently this module has only been tested in a Linux environment.

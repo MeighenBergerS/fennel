@@ -1,0 +1,12 @@
+build
+.vscode
+py_run.mac
+
+.*.sw*
+
+*.pyc
+.ipynb_checkpoints
+
+venv3
+
+*.json

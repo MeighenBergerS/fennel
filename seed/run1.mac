@@ -1,0 +1,22 @@
+# Macro file for example showers
+# 
+# Can be run in batch, without graphic
+# or interactively: Idle> /control/execute run1.mac
+#
+# Change the default number of workers (in multi-threading mode) 
+/run/numberOfThreads 4
+#
+# Initialize kernel
+/run/initialize
+#
+# Frequency of printing
+/run/printProgress 100
+#
+# set cut in run
+/run/setCut 0.1 cm
+# 
+# The events
+#
+/gun/particle proton
+/gun/energy 1 TeV
+/run/beamOn 100

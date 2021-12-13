@@ -1,0 +1,5 @@
+pyyaml
+matplotlib
+numpy
+scipy
+flake8
