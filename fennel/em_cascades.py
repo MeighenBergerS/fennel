@@ -97,6 +97,12 @@ class EM_Cascade(object):
             The track lengths for different energies
         track_length_dev : np.array
             The track lengths deviations for different energies
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: \\alpha E^{\\beta}
         """
         params = self._params["track parameters"][name]
         alpha = params["alpha"]
@@ -127,6 +133,12 @@ class EM_Cascade(object):
         res : np.array
             Is equal to l^(-1) * dl/dt. The result will be 2 dimensional, with
             cm defined along the first axis and energies along the second
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: b\\times \\frac{(tb)^{a-1}e^{-tb}}{\\Gamma(a)}
         """
         t = z / self._Lrad
         b = self._b_energy_fetch(name)
@@ -154,6 +166,12 @@ class EM_Cascade(object):
         -------
         a : np.array
             The values for the energies of interest
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: \\alpha + \\beta log_{10}(E)
         """
         params = self._params["longitudinal parameters"][
             name]
@@ -176,6 +194,12 @@ class EM_Cascade(object):
         -------
         b : np.array
             The values for the energies of interest
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: b = b
         """
         params = self._params["longitudinal parameters"][
             name]
@@ -204,6 +228,12 @@ class EM_Cascade(object):
         -------
         distro : np.array
             The distribution of emitted photons given the angle
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: a e^{b (1/n - cos(\\phi))^c} + d
         """
         params = self._params["angular distribution"][name]
         a = params["a"]
@@ -235,6 +265,12 @@ class EM_Cascade(object):
             The track lengths for different energies
         track_length_dev : float
             The track lengths deviations for different energies
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: \\alpha E^{\\beta}
         """
         params = self._params["track parameters"][name]
         alpha = params["alpha"]
@@ -264,6 +300,12 @@ class EM_Cascade(object):
         -------
         res : float
             Is equal to l^(-1) * dl/dt
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: b\\times \\frac{(tb)^{a-1}e^{-tb}}{\\Gamma(a)}
         """
         t = z / self._Lrad
         b = self._b_energy_fetch_jax(name)
@@ -286,6 +328,12 @@ class EM_Cascade(object):
         -------
         a : float
             The values for the energies of interest
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: \\alpha + \\beta log_{10}(E)
         """
         params = self._params["longitudinal parameters"][
             name]
@@ -308,6 +356,12 @@ class EM_Cascade(object):
         -------
         b : float
             The values for the energies of interest
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: b = b
         """
         params = self._params["longitudinal parameters"][
             name]
@@ -336,6 +390,12 @@ class EM_Cascade(object):
         -------
         distro : float
             The distribution of emitted photons given the angle
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: a e^{b (1/n - cos(\\phi))^c} + d
         """
         params = self._params["angular distribution"][name]
         a = params["a"]

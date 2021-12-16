@@ -7,7 +7,7 @@ def main():
     """
     print("Welcome to fennel!")
     print("Please note fennel is a package and cannot be directly executed")
-    print("The current fennel version is 1.2.2")
+    print("The current fennel version is 1.2.3")
     print("Usage after installation:")
     print("from fennel import Fennel")
     print("fennel_obj = Fennel()")

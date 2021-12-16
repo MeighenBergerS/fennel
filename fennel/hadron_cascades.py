@@ -135,6 +135,12 @@ class Hadron_Cascade(object):
             The track lengths for different energies
         track_length_dev : np.array
             The track lengths deviations for different energies
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: \\alpha E^{\\beta}
         """
         params = self._params["track parameters"][particle]
         alpha = params["alpha"]
@@ -161,6 +167,12 @@ class Hadron_Cascade(object):
             The fraction for the given energies
         em_fraction_sd : np.array
             The standard deviation
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: 1 - (1 - f_0)\\left(\\frac{E}{E_s}\\right)^{-m}
         """
         params = self._params["em fraction"][particle]
         Es = params["Es"]
@@ -191,6 +203,12 @@ class Hadron_Cascade(object):
         res : np.array
             Is equal to l^(-1) * dl/dt. The result will be 2 dimensional, with
             cm defined along the first axis and energies along the second
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: b\\times \\frac{(tb)^{a-1}e^{-tb}}{\\Gamma(a)}
         """
         t = z / self._Lrad
         b = self._b_energy_fetcher(particle)
@@ -219,6 +237,12 @@ class Hadron_Cascade(object):
         -------
         a : np.array
             The values for the energies of interest
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: \\alpha + \\beta log_{10}(E)
         """
         params = self._params["longitudinal parameters"][
             particle]
@@ -242,6 +266,12 @@ class Hadron_Cascade(object):
         -------
         b : np.array
             The values for the energies of interest
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: b = b
         """
         params = self._params["longitudinal parameters"][
             particle]
@@ -273,6 +303,12 @@ class Hadron_Cascade(object):
             The distribution of emitted photons given the angle. The
             result is a 2d array with the first axis for the angles and
             the second for the energies.
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: a e^{b (1/n - cos(\\phi))^c} + d
         """
         a, b, c, d = self._energy_dependence_angle_pars(E, particle)
         distro = np.array([
@@ -306,6 +342,12 @@ class Hadron_Cascade(object):
             The third parameter values for the given energies
         d : np.array
             The fourth parameter values for the given energies
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: par = par_0  log(E) par_1
         """
         params = config[
             "hadron cascade"
@@ -339,6 +381,12 @@ class Hadron_Cascade(object):
         -------
         distro: float/np.array
             The distribution/value of the produced muons
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: -\\alpha + \\beta\\left(\\frac{E}{GeV}\\right)^{-\\gamma}
         """
         # Converting the primary energy to an array
         energy_prim = np.array([Eprim]).flatten()
@@ -415,6 +463,12 @@ class Hadron_Cascade(object):
             The track lengths for different energies
         track_length_dev : float
             The track lengths deviations for different energies
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: \\alpha E^{\\beta}
         """
         params = self._params["track parameters"][particle]
         alpha = params["alpha"]
@@ -441,6 +495,12 @@ class Hadron_Cascade(object):
             The fraction for the given energies
         em_fraction_sd : float
             The standard deviation
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: 1 - (1 - f_0)\\left(\\frac{E}{E_s}\\right)^{-m}
         """
         params = self._params["em fraction"][particle]
         Es = params["Es"]
@@ -470,6 +530,12 @@ class Hadron_Cascade(object):
         -------
         res : int
             Is equal to l^(-1) * dl/dt.
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: b\\times \\frac{(tb)^{a-1}e^{-tb}}{\\Gamma(a)}
         """
         t = z / self._Lrad
         b = self._b_energy_fetcher_jax(particle)
@@ -492,6 +558,12 @@ class Hadron_Cascade(object):
         -------
         a : float
             The values for the energies of interest
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: \\alpha + \\beta log_{10}(E)
         """
         params = self._params["longitudinal parameters"][
             particle]
@@ -513,6 +585,12 @@ class Hadron_Cascade(object):
         -------
         b : int
             The values for the energies of interest
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: b = b
         """
         params = self._params["longitudinal parameters"][
             particle]
@@ -544,6 +622,12 @@ class Hadron_Cascade(object):
             The distribution of emitted photons given the angle. The
             result is a 2d array with the first axis for the angles and
             the second for the energies.
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: a e^{b (1/n - cos(\\phi))^c} + d
         """
         a, b, c, d = self._energy_dependence_angle_pars_jax(E, particle)
         distro = (
@@ -576,6 +660,12 @@ class Hadron_Cascade(object):
             The third parameter value for the given energy
         d : float
             The fourth parameter value for the given energy
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: par = par_0  log(E) par_1
         """
         params = self._params["angular distribution"][particle]
         a_pars = params["a pars"]
@@ -609,6 +699,12 @@ class Hadron_Cascade(object):
         -------
         distro: float
             The distribution/value of the produced muons
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: -\\alpha + \\beta\\left(\\frac{E}{GeV}\\right)^{-\\gamma}
         """
         energy_prim = Eprim
         energy = Emu

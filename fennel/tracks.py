@@ -95,6 +95,12 @@ class Track(object):
         -------
         ratio : np.array
             The resulting ratio
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: \\lambda + \\kappa log(E)
         """
         params = self._params["additional track " + self._medium][
             interaction
@@ -129,6 +135,12 @@ class Track(object):
             The distribution of emitted photons given the angle. The
             result is a 2d array with the first axis for the angles and
             the second for the energies.
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: a e^{b (1/n - cos(\\phi))^c}
         """
         a, b, c = self._energy_dependence_angle_pars(E)
         distro = np.array([
@@ -186,6 +198,12 @@ class Track(object):
         -------
         ratio : float
             The resulting ratio
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: \\lambda + \\kappa log(E)
         """
         params = self._params["additional track " + self._medium][
             interaction
@@ -221,6 +239,12 @@ class Track(object):
             The distribution of emitted photons given the angle. The
             result is a 2d array with the first axis for the angles and
             the second for the energies.
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: a e^{b (1/n - cos(\\phi))^c}
         """
         a, b, c = self._energy_dependence_angle_pars_jax(E)
         distro = (a * jnp.exp(b * jnp.abs(
@@ -246,6 +270,12 @@ class Track(object):
             The second parameter value for the given energy
         c : float
             The third parameter value for the given energy
+
+        Notes
+        -----
+        The analytical form of the parametrization is:
+
+        .. math:: par = par_0  log(E) par_1
         """
         params = self._params["angular distribution"]
         a_pars = params["a pars"]
