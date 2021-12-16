@@ -13,3 +13,5 @@ Fennel.egg-info
 fennel_seed.egg-info
 build
 dist
+*.pyx
+*.pyd

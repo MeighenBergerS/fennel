@@ -5,6 +5,8 @@
 
 import logging
 import numpy as np
+import pickle
+import pkgutil
 from .config import config
 # Checking if jax should be used
 try:
@@ -51,6 +53,17 @@ class Track(object):
         _log.debug('Constructing a track object')
         self._medium = config["scenario"]["medium"]
         self._n = config["mediums"][self._medium]["refractive index"]
+        if config["scenario"]["parametrization"] == "aachen":
+            _log.info("Loading the aachen parametrization")
+            param_file = pkgutil.get_data(
+                    __name__,
+                    "data/%s.pkl" % config["scenario"]["parametrization"]
+            )
+            self._params = pickle.loads(param_file)["track"]
+        else:
+            raise ValueError("Track parametrization " +
+                             config["scenario"]["parametrization"] +
+                             " not implemented!")
         if config["general"]["jax"]:
             _log.debug("Using JAX")
             self.additional_track_ratio = (
@@ -83,7 +96,7 @@ class Track(object):
         ratio : np.array
             The resulting ratio
         """
-        params = config["track"]["additional track " + self._medium][
+        params = self._params["additional track " + self._medium][
             interaction
         ]
         lambd = params["lambda"]
@@ -146,7 +159,7 @@ class Track(object):
         c : np.array
             The third parameter values for the given energies
         """
-        params = config["track"]["angular distribution"]
+        params = self._params["angular distribution"]
         a_pars = params["a pars"]
         b_pars = params["b pars"]
         c_pars = params["c pars"]
@@ -174,7 +187,7 @@ class Track(object):
         ratio : float
             The resulting ratio
         """
-        params = config["track"]["additional track " + self._medium][
+        params = self._params["additional track " + self._medium][
             interaction
         ]
         lambd = params["lambda"]
@@ -234,7 +247,7 @@ class Track(object):
         c : float
             The third parameter value for the given energy
         """
-        params = config["track"]["angular distribution"]
+        params = self._params["angular distribution"]
         a_pars = params["a pars"]
         b_pars = params["b pars"]
         c_pars = params["c pars"]

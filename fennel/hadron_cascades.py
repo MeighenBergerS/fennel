@@ -63,8 +63,16 @@ class Hadron_Cascade(object):
         self._Lrad = self._radlength / self._medium["density"]
         if config["scenario"]["parametrization"] == "aachen":
             _log.info("Loading the aachen parametrization")
+            param_file = pkgutil.get_data(
+                    __name__,
+                    "data/%s.pkl" % config["scenario"]["parametrization"]
+            )
+            self._params = pickle.loads(param_file)["hadron cascade"]
             muon_data = pkgutil.get_data(
-                    __name__, "data/muon_production.pkl"
+                    __name__,
+                    "data/%s_muon_production.pkl" % (
+                        config["scenario"]["parametrization"]
+                    )
             )
             if muon_data is None:
                 raise ValueError("Muon production data not found!")
@@ -128,7 +136,7 @@ class Hadron_Cascade(object):
         track_length_dev : np.array
             The track lengths deviations for different energies
         """
-        params = config["hadron cascade"]["track parameters"][particle]
+        params = self._params["track parameters"][particle]
         alpha = params["alpha"]
         beta = params["beta"]
         alpha_dev = params["alpha dev"]
@@ -154,7 +162,7 @@ class Hadron_Cascade(object):
         em_fraction_sd : np.array
             The standard deviation
         """
-        params = config["hadron cascade"]["em fraction"][particle]
+        params = self._params["em fraction"][particle]
         Es = params["Es"]
         f0 = params["f0"]
         m = params["m"]
@@ -212,7 +220,7 @@ class Hadron_Cascade(object):
         a : np.array
             The values for the energies of interest
         """
-        params = config["hadron cascade"]["longitudinal parameters"][
+        params = self._params["longitudinal parameters"][
             particle]
         alpha = params["alpha"]
         beta = params["beta"]
@@ -235,7 +243,7 @@ class Hadron_Cascade(object):
         b : np.array
             The values for the energies of interest
         """
-        params = config["hadron cascade"]["longitudinal parameters"][
+        params = self._params["longitudinal parameters"][
             particle]
         b = params["b"]
         return b
@@ -408,7 +416,7 @@ class Hadron_Cascade(object):
         track_length_dev : float
             The track lengths deviations for different energies
         """
-        params = config["hadron cascade"]["track parameters"][particle]
+        params = self._params["track parameters"][particle]
         alpha = params["alpha"]
         beta = params["beta"]
         alpha_dev = params["alpha dev"]
@@ -434,7 +442,7 @@ class Hadron_Cascade(object):
         em_fraction_sd : float
             The standard deviation
         """
-        params = config["hadron cascade"]["em fraction"][particle]
+        params = self._params["em fraction"][particle]
         Es = params["Es"]
         f0 = params["f0"]
         m = params["m"]
@@ -485,7 +493,7 @@ class Hadron_Cascade(object):
         a : float
             The values for the energies of interest
         """
-        params = config["hadron cascade"]["longitudinal parameters"][
+        params = self._params["longitudinal parameters"][
             particle]
         alpha = params["alpha"]
         beta = params["beta"]
@@ -506,7 +514,7 @@ class Hadron_Cascade(object):
         b : int
             The values for the energies of interest
         """
-        params = config["hadron cascade"]["longitudinal parameters"][
+        params = self._params["longitudinal parameters"][
             particle]
         b = params["b"]
         return b

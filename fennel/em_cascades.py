@@ -5,6 +5,8 @@
 
 import logging
 import numpy as np
+import pickle
+import pkgutil
 from scipy.special import gamma as gamma_func
 from .config import config
 try:
@@ -53,6 +55,17 @@ class EM_Cascade(object):
         self._n = self._medium["refractive index"]
         self._radlength = self._medium["radiation length"]
         self._Lrad = self._radlength / self._medium["density"]
+        if config["scenario"]["parametrization"] == "aachen":
+            _log.info("Loading the aachen parametrization")
+            param_file = pkgutil.get_data(
+                    __name__,
+                    "data/%s.pkl" % config["scenario"]["parametrization"]
+            )
+            self._params = pickle.loads(param_file)["em cascade"]
+        else:
+            raise ValueError("EM parametrization " +
+                             config["scenario"]["parametrization"] +
+                             " not implemented!")
         if config["general"]["jax"]:
             _log.info("Running with JAX functions")
             self.cherenkov_angle_distro = self._symmetric_angle_distro_jax
@@ -85,7 +98,7 @@ class EM_Cascade(object):
         track_length_dev : np.array
             The track lengths deviations for different energies
         """
-        params = config["em cascade"]["track parameters"][name]
+        params = self._params["track parameters"][name]
         alpha = params["alpha"]
         beta = params["beta"]
         alpha_dev = params["alpha dev"]
@@ -142,7 +155,7 @@ class EM_Cascade(object):
         a : np.array
             The values for the energies of interest
         """
-        params = config["em cascade"]["longitudinal parameters"][
+        params = self._params["longitudinal parameters"][
             name]
         alpha = params["alpha"]
         beta = params["beta"]
@@ -164,7 +177,7 @@ class EM_Cascade(object):
         b : np.array
             The values for the energies of interest
         """
-        params = config["em cascade"]["longitudinal parameters"][
+        params = self._params["longitudinal parameters"][
             name]
         b = params["b"]
         return b
@@ -192,7 +205,7 @@ class EM_Cascade(object):
         distro : np.array
             The distribution of emitted photons given the angle
         """
-        params = config["em cascade"]["angular distribution"][name]
+        params = self._params["angular distribution"][name]
         a = params["a"]
         b = params["b"]
         c = params["c"]
@@ -223,7 +236,7 @@ class EM_Cascade(object):
         track_length_dev : float
             The track lengths deviations for different energies
         """
-        params = config["em cascade"]["track parameters"][name]
+        params = self._params["track parameters"][name]
         alpha = params["alpha"]
         beta = params["beta"]
         alpha_dev = params["alpha dev"]
@@ -274,7 +287,7 @@ class EM_Cascade(object):
         a : float
             The values for the energies of interest
         """
-        params = config["em cascade"]["longitudinal parameters"][
+        params = self._params["longitudinal parameters"][
             name]
         alpha = params["alpha"]
         beta = params["beta"]
@@ -296,7 +309,7 @@ class EM_Cascade(object):
         b : float
             The values for the energies of interest
         """
-        params = config["em cascade"]["longitudinal parameters"][
+        params = self._params["longitudinal parameters"][
             name]
         b = params["b"]
         return b
@@ -324,7 +337,7 @@ class EM_Cascade(object):
         distro : float
             The distribution of emitted photons given the angle
         """
-        params = config["em cascade"]["angular distribution"][name]
+        params = self._params["angular distribution"][name]
         a = params["a"]
         b = params["b"]
         c = params["c"]
