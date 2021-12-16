@@ -577,9 +577,7 @@ class Hadron_Cascade(object):
         d : float
             The fourth parameter value for the given energy
         """
-        params = config[
-            "hadron cascade"
-        ]["angular distribution"][particle]
+        params = self._params["angular distribution"][particle]
         a_pars = params["a pars"]
         b_pars = params["b pars"]
         c_pars = params["c pars"]
