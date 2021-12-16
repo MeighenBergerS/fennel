@@ -13,5 +13,6 @@ Fennel.egg-info
 fennel_seed.egg-info
 build
 dist
+/fennel/generated.c
 *.pyx
 *.pyd
