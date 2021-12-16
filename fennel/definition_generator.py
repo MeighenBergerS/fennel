@@ -169,7 +169,7 @@ class Definitions_Generator(object):
         items = []
         for k, v in d.items():
             new_key = parent_key + sep + str(k) if parent_key else str(k)
-            if isinstance(v, collections.MutableMapping):
+            if isinstance(v, collections.abc.MutableMapping):
                 items.extend(self._flatten(v, str(new_key), sep=sep).items())
             else:
                 items.append((new_key, v))
