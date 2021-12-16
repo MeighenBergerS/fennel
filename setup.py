@@ -23,6 +23,7 @@ setup(
         "PyYAML",
         "numpy",
         "scipy",
+        "pandas"
     ],
     extras_require={
         "interactive": ["nbstripout", "matplotlib", "jupyter", "tqdm"],

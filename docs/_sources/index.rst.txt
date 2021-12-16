@@ -67,6 +67,15 @@ fennel.tracks module
    :show-inheritance:
    :private-members:
 
+fennel.definition_generator module
+--------------------
+
+.. automodule:: fennel.definition_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
 Module contents
 ---------------
 

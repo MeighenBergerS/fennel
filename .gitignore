@@ -16,3 +16,4 @@ dist
 /fennel/generated.c
 *.pyx
 *.pyd
+*.csv

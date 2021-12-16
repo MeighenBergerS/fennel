@@ -391,6 +391,8 @@ _baseconfig = {
         "angles": np.linspace(0., 180., 100),  # in degrees
         # The grid used for long profiling. Given in cm
         "z grid": np.linspace(0., 1e4, int(1e4)),
+        # Location and name of the definitions file
+        "generated definitions": "generated_definitions.pyx",
     },
 }
 

@@ -20,6 +20,7 @@ from .tracks import Track
 from .em_cascades import EM_Cascade
 from .hadron_cascades import Hadron_Cascade
 from .photons import Photon
+from .definition_generator import Definitions_Generator
 try:
     from jax.random import PRNGKey
 except ImportError:
@@ -145,6 +146,10 @@ class Fennel(object):
         self._photon = Photon(
             self._particles, self._track,
             self._em_cascade, self._hadron_cascade
+        )
+        # Creating the definitions storer
+        self._dg = Definitions_Generator(
+            self._track, self._em_cascade, self._hadron_cascade
         )
         _log.info('Creation finished')
         _log.info('---------------------------------------------------')
@@ -442,6 +447,32 @@ class Fennel(object):
         return self._photon._hadron_cascade_fetcher(
             energy, particle, wavelengths, angle_grid, n, z_grid, function
         )
+
+    def definitions(self):
+        """ Write the definitions file
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        self._dg._write()
+
+    def pars2csv(self):
+        """ Write the parameters to a csv file
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        self._dg._pars2csv()
 
     def hidden_function(self):
         """ Yaha! You found me!
