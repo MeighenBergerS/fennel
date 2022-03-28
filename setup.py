@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="fennel_seed",
-    version="1.2.3",
+    version="1.3.3",
     description="Light-yields for tracks, and cascades",
     long_description=README,
     long_description_content_type="text/markdown",

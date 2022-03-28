@@ -45,12 +45,12 @@ https://www.institut3b.physik.rwth-aachen.de/global/show_document.asp?id=aaaaaaa
 
 Please cite this [software](https://github.com/MeighenBergerS/fennel) using
 ```
-@software{fennel2021@github,
+@software{fennel2022@github,
   author = {Stephan Meighen-Berger},
   title = {{Fennel}: Light from tracks and cascades,
   url = {https://github.com/MeighenBergerS/fennel},
-  version = {1.2.3},
-  year = {2021},
+  version = {1.3.3},
+  year = {2022},
 }
 ```
 
@@ -78,19 +78,22 @@ Or install using the setup.py
 
 Please note that JAX is not included in the basic installation.
 To use this option, please also install JAX or install fennel using:
-Install using pip:
 ```python
 pip install fennel_seed[jax]
 ```
 
-To be able to run the example notebook use
-Install using pip:
+For the cpu version of jax use:
+```python
+pip install fennel_seed[cpu]
+```
+
+To be able to run the example notebook use:
 ```python
 pip install fennel_seed[interactive]
 ```
 
 ## Beta <a name="beta"></a>
-Fennel offers a few subprojects which are currently still in beta. While this projects work, they have as of yet not been designed for usability. Currently available subprojects are available offer the GitHub repository (not pip!). Subprojects are:
+Fennel offers a few subprojects which are currently still in beta. While these projects work, they have as of yet not been designed for usability. Currently available subprojects are available offer the GitHub repository (not pip!). Subprojects are:
 
 1. Jfennel: A Julia implementation of Fennel. This is its own branch in the repository and still requires further work and cross-checks.
 
