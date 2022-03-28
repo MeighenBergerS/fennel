@@ -5,6 +5,7 @@ matplotlib
 numpy
 scipy
 tqdm
-jax[cpu]
+jax
+jaxlib
 flake8
 pandas
