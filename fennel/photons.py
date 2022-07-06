@@ -1037,7 +1037,7 @@ class Photon(object):
             prefac / (lambd * 1e-9)**2. * track_length * 1e-2
             for lambd in wavelengths
         ])
-        return diff_counts * 1e-9 / np.pi
+        return diff_counts * 1e-9
 
     def _cherenkov_counts_jax(
             self,
@@ -1065,4 +1065,4 @@ class Photon(object):
         diff_counts = (
             prefac / (wavelengths * 1e-9)**2. * track_lengths * 1e-2
         )
-        return diff_counts * 1e-9 / jnp.pi
+        return diff_counts * 1e-9
