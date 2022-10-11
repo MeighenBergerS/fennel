@@ -10,3 +10,7 @@ py_run.mac
 venv3
 
 *.json
+
+geant4-v11.0.3
+
+*.gz

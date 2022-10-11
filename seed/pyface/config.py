@@ -14,7 +14,7 @@ _baseconfig = {
     ###########################################################################
     "general": {
         # If files should be dumped or not
-        "dump": True,
+        "dump": False,
         # Random state seed
         "config location": "../run/pyface.txt",
         # Location of the output files

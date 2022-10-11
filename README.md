@@ -36,14 +36,15 @@ Volume 38,
 2012,
 Pages 53-67,
 ISSN 0927-6505,\
-https://doi.org/10.1016/j.astropartphys.2012.09.008.
-(https://www.sciencedirect.com/science/article/pii/S0927650512001831)
+<https://doi.org/10.1016/j.astropartphys.2012.09.008.>
+(<https://www.sciencedirect.com/science/article/pii/S0927650512001831>)
 
 and
 
-https://www.institut3b.physik.rwth-aachen.de/global/show_document.asp?id=aaaaaaaaaapwhjz
+<https://www.institut3b.physik.rwth-aachen.de/global/show_document.asp?id=aaaaaaaaaapwhjz>
 
 Please cite this [software](https://github.com/MeighenBergerS/fennel) using
+
 ```
 @software{fennel2022@github,
   author = {Stephan Meighen-Berger},
@@ -58,19 +59,21 @@ and their work when using this package.
 
 ## Documentation <a name="documentation"></a>
 
-The package provides automatically generated documentation under 
-https://meighenbergers.github.io/fennel/
+The package provides automatically generated documentation under
+<https://meighenbergers.github.io/fennel/>
 
 ## Installation <a name="installation"></a>
 
 Install using pip:
+
 ```python
 pip install fennel_seed
 ```
+
 [The PyPi webpage](https://pypi.org/project/fennel-seed/)
 
 Other installation methods:
-To install please clone the (repository)[https://github.com/MeighenBergerS/fennel] or download the latest release. Then
+To install please clone the [repository](https://github.com/MeighenBergerS/fennel) or download the latest release. Then
 follow the instructions given in INSTALL.txt.
 Note this should install all necessary components.
 
@@ -78,23 +81,27 @@ Or install using the setup.py
 
 Please note that JAX is not included in the basic installation.
 To use this option, please also install JAX or install fennel using:
+
 ```python
 pip install fennel_seed[jax]
 ```
 
 For the cpu version of jax use:
+
 ```python
 pip install fennel_seed[cpu]
 ```
 
 To be able to run the example notebook use:
+
 ```python
 pip install fennel_seed[interactive]
 ```
 
 ## Beta <a name="beta"></a>
+
 Fennel offers a few subprojects which are currently still in beta. While these projects work, they have as of yet not been designed for usability. Currently available subprojects are available offer the GitHub repository (not pip!). Subprojects are:
 
 1. Jfennel: A Julia implementation of Fennel. This is its own branch in the repository and still requires further work and cross-checks.
 
-2. Seed: An interface to the Geant4 code used for the parametrization. The code itself offers a Python interface for ease of use. To use this code, a Geant4 installation is required. Currently this module has only been tested in a Linux environment. The code itself is contained in the seed folder and includes some examples in the notebooks folder on how to use it.
+2. Seed: An interface to the Geant4 code used for the parametrization. The code itself offers a Python interface for ease of use. To use this code, a Geant4 installation is required. Currently this module has only been tested in a Linux environment. The code itself is contained in the seed folder and includes some examples in the notebooks folder on how to use it. Please note the codes there work for Geant4 version 1.10. Version 1.11 breaks compability with of some of the provided codes.
