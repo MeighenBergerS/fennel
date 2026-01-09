@@ -98,7 +98,7 @@ jobs:
         pytest tests/test_physics_regression.py -v -m physics
 
     - name: Archive reference values
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: reference-values
         path: tests/reference_values_v1.3.4.json
