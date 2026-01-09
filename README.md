@@ -72,6 +72,40 @@ pip install fennel_seed
 
 [The PyPi webpage](https://pypi.org/project/fennel-seed/)
 
+Note: The current pip (PyPI) release of `fennel_seed` is based on Fennel v1.3.4. The repository's `master` branch contains the newer v2 API; until a new release is published to PyPI, `pip install fennel_seed` reflects the v1.3.4 behavior and interfaces.
+
+### Install v2 (from source)
+
+To use the latest v2 API from this repository:
+
+```bash
+# Clone (or use your existing clone)
+git clone https://github.com/MeighenBergerS/fennel.git
+cd fennel
+
+# Create and activate a virtual environment (recommended)
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install the package from source
+pip install -e .
+
+# Optional extras (for notebooks/plots)
+pip install -e .[interactive]
+```
+
+### Install v2 (from GitHub)
+
+You can install directly from the repository without cloning:
+
+```bash
+# Latest master
+pip install "fennel_seed @ git+https://github.com/MeighenBergerS/fennel.git@master"
+
+# With optional interactive extras (notebooks/plots)
+pip install "fennel_seed[interactive] @ git+https://github.com/MeighenBergerS/fennel.git@master"
+```
+
 Other installation methods:
 To install please clone the [repository](https://github.com/MeighenBergerS/fennel) or download the latest release. Then
 follow the instructions given in INSTALL.txt.
@@ -96,6 +130,28 @@ To be able to run the example notebook use:
 
 ```python
 pip install fennel_seed[interactive]
+```
+
+## Development
+
+This repository uses pre-commit hooks to keep the codebase tidy and to ensure Jupyter notebooks are clean (no cell outputs) before committing.
+
+### Pre-commit hooks
+
+- Formatting and linting (Black, isort, Flake8) run automatically.
+- Notebook outputs are stripped on commit via `nbstripout` for all `.ipynb` files.
+
+Enable locally:
+
+```bash
+pip install pre-commit
+pre-commit install
+
+# Optional: run on the entire repo immediately
+pre-commit run --all-files
+
+# Only strip notebook outputs across the repo
+pre-commit run nbstripout --all-files
 ```
 
 ## Beta <a name="beta"></a>

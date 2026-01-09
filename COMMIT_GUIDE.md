@@ -12,9 +12,15 @@ This guide walks through best practices for committing the v2.0.0 changes to fen
 ⏭️ **6 tests skipped** - JAX tests (optional dependency)
 
 ### Git Status
-- **Branch**: `smb/version_2_0`
-- **Modified files**: 14 core files
-- **New files**: Tests, docs, validation module, result containers, CI/CD config
+- **Branch**: `master`
+- **Modified files**: Documentation, config, pre-commit hooks, example notebooks (outputs stripped)
+- **Files changed**: 9 (README.md, COMMIT_GUIDE.md, .gitignore, .pre-commit-config.yaml, example*.ipynb, seed/examples/*.ipynb)
+- **Recent updates**:
+  - All Jupyter notebooks cleaned (outputs stripped via nbstripout)
+  - .gitignore updated to ignore venv patterns (venv*/, .venv*/)
+  - README.md expanded with v2 installation sections (from source, from GitHub)
+  - .pre-commit-config.yaml migrated to latest format (fixed deprecation warnings)
+  - COMMIT_GUIDE.md updated with notebook cleaning docs
 
 ## Pre-Commit Checklist
 
@@ -53,6 +59,49 @@ git diff fennel/results.py
 ```
 
 ## Commit Strategy
+
+### Current Session: Documentation & Tooling Updates
+
+This session adds developer tooling and installation documentation for v2 API:
+
+**Stage all modified files:**
+```bash
+# Documentation and installation
+git add README.md
+
+# Configuration and tooling
+git add .gitignore
+git add .pre-commit-config.yaml
+git add COMMIT_GUIDE.md
+
+# Cleaned notebooks (outputs stripped)
+git add notebooks/example.ipynb
+git add notebooks/example_jax.ipynb
+git add notebooks/example_v2.ipynb
+git add seed/examples/plot_generator.ipynb
+git add seed/examples/pyface_fennel.ipynb
+
+# Commit
+git commit -m "docs: Add v2 installation docs, pre-commit hooks, and notebook output cleaning
+
+Changes:
+- README.md: Added v2 installation sections (from source, from GitHub direct URL)
+- README.md: Clarified that current PyPI v1.3.4; master contains v2.0
+- .gitignore: Added patterns for virtualenv directories (venv*/, .venv*/)
+- .pre-commit-config.yaml: Added nbstripout hook for automatic notebook cleaning
+- .pre-commit-config.yaml: Migrated to latest format (fixed deprecation warnings)
+- COMMIT_GUIDE.md: Documented notebook stripping in pre-commit section
+- All notebooks: Stripped outputs via nbstripout (outputs removed, metadata normalized)
+
+Impact:
+- Users can now install v2 from source or directly from GitHub
+- Developers can clone and install with pre-commit hooks enabled
+- Jupyter notebooks stay clean in version control (no cell outputs)
+- All pre-commit warnings resolved; ready for future updates
+
+BREAKING: None - documentation and tooling only
+"
+```
 
 ### Recommended: Single Feature Commit
 
@@ -228,10 +277,13 @@ The [.pre-commit-config.yaml](.pre-commit-config.yaml) will automatically:
 - Sort imports with isort
 - Lint with flake8
 - Check YAML/JSON/TOML syntax
+- Strip outputs from Jupyter notebooks (.ipynb)
 
 Run manually anytime:
 ```bash
 pre-commit run --all-files
+# Only strip notebook outputs across the repo
+pre-commit run nbstripout --all-files
 ```
 
 ## Version Bumping

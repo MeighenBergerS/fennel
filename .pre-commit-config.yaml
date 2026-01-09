@@ -39,3 +39,11 @@ repos:
       - id: isort
         args: ['--profile=black']
         exclude: ^(seed/|docs/|site/)
+
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.6.1
+    hooks:
+      - id: nbstripout
+        name: Strip output from Jupyter notebooks
+        files: \.ipynb$
+        stages: [pre-commit]

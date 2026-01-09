@@ -8,6 +8,11 @@ fennel.log
 venv3
 venv
 .venv
+.venv_v2test/
+
+# Common virtualenv patterns (keep minimal scope)
+venv*/
+.venv*/
 
 *.json
 !tests/reference_values_v1.3.4.json
