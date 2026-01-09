@@ -1,47 +1,74 @@
 # -*- coding: utf-8 -*-
-# Name: particle.py
-# Authors: Stephan Meighen-Berger
-# Containts the particle class definitions
+"""
+Particle class definitions for fennel.
+
+This module defines the Particle class which encapsulates particle properties
+from the PDG (Particle Data Group) numbering scheme.
+"""
 
 import logging
-from .config import config
 
+from .config import config
 
 _log = logging.getLogger(__name__)
 
 
-class Particle(object):
-    """Constructs the particle object.
+class Particle:
+    """
+    Particle object representing a physics particle.
+
+    This class stores particle properties such as PDG ID, name, mass,
+    and standard track length for use in light yield calculations.
 
     Parameters
     ----------
-    None
+    pdg_id : int
+        The PDG (Particle Data Group) identification number of the particle.
+        Supported particles include electrons (11), positrons (-11), muons (13, -13),
+        photons (22), pions (211, -211), kaons (130), protons (2212, -2212), and neutrons (2112).
 
-    Returns
-    -------
-    None
+    Attributes
+    ----------
+    _pdg_id : int
+        The PDG identification number
+    _name : str
+        Particle name following PDG Monte Carlo naming convention
+    _energies : np.ndarray
+        Energy grid for calculations
+    _mass : float, optional
+        Particle rest mass in GeV (for muons)
+    _std_track : float, optional
+        Standard track length in cm (for muons)
 
-    Raises
-    ------
+    Examples
+    --------
+    >>> from fennel.particle import Particle
+    >>> muon = Particle(13)
+    >>> print(muon._name)
+    'mu-'
+
+    Notes
+    -----
+    Currently, only muons have their mass and standard track length implemented.
     """
-    def __init__(self, pdg_id: int):
-        """Constructs the particle.
+
+    def __init__(self, pdg_id: int) -> None:
+        """
+        Initialize a Particle object.
 
         Parameters
         ----------
         pdg_id : int
-            The pdg number of the particle
-
-        Returns
-        -------
-        None
+            The PDG number of the particle
 
         Raises
         ------
+        KeyError
+            If the PDG ID is not recognized in the configuration
         """
         if not config["general"]["enable logging"]:
             _log.disabled = True
-        _log.info('Constructing a particle')
+        _log.info("Constructing a particle")
         self._pdg_id = pdg_id
         # Naming conventions PDG Monte Carlo scheme
         self._name = config["pdg id"][pdg_id]

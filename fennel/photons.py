@@ -1,70 +1,106 @@
 # -*- coding: utf-8 -*-
-# Name: photons.py
-# Authors: Stephan Meighen-Berger
-# Calculates the number of photons depending on the track length
+"""
+Cherenkov photon yield calculations.
+
+This module calculates the number and distribution of Cherenkov photons
+produced by particles (tracks) and cascades (electromagnetic and hadronic).
+Provides fetcher and builder methods for different particle types.
+"""
 
 import logging
+from typing import Callable, Dict, Tuple, Union
+
 import numpy as np
+
 from .config import config
-from .tracks import Track
 from .em_cascades import EM_Cascade
 from .hadron_cascades import Hadron_Cascade
+from .particle import Particle
+from .tracks import Track
+
 try:
     import jax.numpy as jnp
+    from jax import Array as JaxArray
     from jax import jit
     from jax.random import normal as jnormal
 except ImportError:
+    jnp = None
+    jit = None
+    JaxArray = None
+    jnormal = None
     if config["general"]["jax"]:
-        raise ImportError("Jax not found!")
+        raise ImportError("JAX not found! Install with: pip install jax jaxlib")
 
 
 _log = logging.getLogger(__name__)
 
 
-class Photon(object):
-    """Constructs the Photon object.
-
-    Parameters
-    ----------
-    None
-
-    Returns
-    -------
-    None
-
-    Raises
-    ------
+class Photon:
     """
+    Cherenkov photon yield calculator.
+
+    Calculates photon production for tracks and cascades, including
+    wavelength-dependent yields and angular distributions.
+
+    Attributes
+    ----------
+    _medium : str
+        Medium name
+    _n : float
+        Refractive index
+    _alpha : float
+        Fine structure constant
+    _charge : float
+        Elementary charge
+    _wavelengths : np.ndarray
+        Wavelength grid in nm
+    _angle_grid : np.ndarray
+        Angular grid in degrees
+    _zgrid : np.ndarray
+        Depth grid in cm
+
+    Examples
+    --------
+    >>> from fennel import Fennel
+    >>> f = Fennel()
+    >>> # Photon object used internally by Fennel
+
+    Notes
+    -----
+    - Handles tracks (muons), EM cascades (e±, γ), and hadronic cascades
+    - Supports both NumPy and JAX backends
+    - Integrates all cascade components
+    """
+
     def __init__(
-            self,
-            particle, track: Track,
-            em_cascade: EM_Cascade, hadron_cascade: Hadron_Cascade):
-        """Constructs the photon.
+        self,
+        particle: Dict[int, Particle],
+        track: Track,
+        em_cascade: EM_Cascade,
+        hadron_cascade: Hadron_Cascade,
+    ) -> None:
+        """
+        Initialize the photon calculator.
 
         Parameters
         ----------
-        particles : dic
-            Library of the particles of interst, each being a Particle object
+        particle : dict of {int: Particle}
+            Dictionary of particle objects keyed by PDG ID
         track : Track
-            The particle for which the tracks should be generated
-        em_cascade : Particle
-            The particle for which the tracks should be generated
-        hadron_cascades : Hadron_Cascade
-            The particle for which the tracks should be generated
-
-
-        Returns
-        -------
-        None
+            Track calculator instance
+        em_cascade : EM_Cascade
+            EM cascade calculator instance
+        hadron_cascade : Hadron_Cascade
+            Hadron cascade calculator instance
 
         Raises
         ------
         ValueError
-            Other distribution type for emission angles is not implemented
+            If distribution type not implemented
         """
         if not config["general"]["enable logging"]:
             _log.disabled = True
-        _log.debug('Constructing a photon object')
+        _log.debug("Constructing a photon object")
         self._medium = config["scenario"]["medium"]
         self._n = config["mediums"][self._medium]["refractive index"]
         self._alpha = config["advanced"]["fine structure"]
@@ -84,123 +120,132 @@ class Photon(object):
         self._track_builder()
         self._em_cascade_builder()
         self._hadron_cascade_builder()
-        _log.debug('Finished a photon object.')
+        _log.debug("Finished a photon object.")
 
     ###########################################################################
     # The Fetchers
     def _track_fetcher(
-            self, energy,
-            wavelengths=config["advanced"]["wavelengths"],
-            angle_grid=config["advanced"]["angles"],
-            n=config["mediums"][
-                config["scenario"]["medium"]]["refractive index"],
-            interaction='total',
-            function=False):
-        """ Fetcher function for a specific energy and wavelength. This is for
-        tracks and currently only for muons. Note in JAX mode the functions
-        only take scalars!
+        self,
+        energy: Union[float, np.ndarray],
+        wavelengths: np.ndarray = config["advanced"]["wavelengths"],
+        angle_grid: np.ndarray = config["advanced"]["angles"],
+        n: float = config["mediums"][config["scenario"]["medium"]]["refractive index"],
+        interaction: str = "total",
+        function: bool = False,
+    ) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[Callable, Callable]]:
+        """
+        Fetch Cherenkov photon yields for particle tracks.
+
+        Calculates or returns functions for differential photon counts
+        and angular distributions from particle tracks (currently muons).
 
         Parameters
         ----------
-        energy : float
-            The energy(ies) of the particle in GeV
-        wavelengths : np.array
-            Optional: The desired wavelengths
-        angle_grid : np.array
-            Optional: The desired angles
-        n : float
-            The refractive index of the medium.
-        interaction : str
-            Optional: The interaction which should produce the light
-        function : bool
-            Optional: returns the functional form instead of the evaluation
+        energy : float or np.ndarray
+            Particle energy(ies) in GeV
+        wavelengths : np.ndarray, optional
+            Wavelength grid in nm
+        angle_grid : np.ndarray, optional
+            Angular grid in degrees
+        n : float, optional
+            Refractive index of medium
+        interaction : str, optional
+            Interaction type: 'total', 'ionization', 'brems', 'pair'
+        function : bool, optional
+            If True, return callable functions; if False, return evaluated arrays
 
         Returns
         -------
-        differential_counts : np.array/function
-            dN/dlambda The differential photon counts per track length (in cm).
-            The shape of the array is len(wavelengths).
-        angles : np.array/function
-            The angular distribution in degrees
+        differential_counts : np.ndarray or Callable
+            dN/dλ per cm of track length [photons/(nm·cm)]
+            Shape: (n_wavelengths,) if evaluated
+        angles : np.ndarray or Callable
+            Angular distribution [photons/degree]
+
+        Notes
+        -----
+        In JAX mode, functions only accept scalar inputs.
         """
         if function:
             _log.debug("Fetching track functions for " + interaction)
             return (
                 self._track_functions_dic[interaction]["dcounts"],
-                self._track_functions_dic[interaction]["angles"]
+                self._track_functions_dic[interaction]["angles"],
             )
         else:
             _log.debug("Fetching track values for " + interaction)
             if config["general"]["jax"]:
-                return(
-                    np.array([
-                        self._track_functions_dic[interaction]["dcounts"](
-                            energy, wavelength
-                        )
-                        for wavelength in wavelengths
-                    ]),
-                    np.array([
-                        self._track_functions_dic[interaction]["angles"](
-                            angle,
-                            n,
-                            energy
-                        )
-                        for angle in angle_grid
-                    ]),
+                return (
+                    np.array(
+                        [
+                            self._track_functions_dic[interaction]["dcounts"](
+                                energy, wavelength
+                            )
+                            for wavelength in wavelengths
+                        ]
+                    ),
+                    np.array(
+                        [
+                            self._track_functions_dic[interaction]["angles"](
+                                angle, n, energy
+                            )
+                            for angle in angle_grid
+                        ]
+                    ),
                 )
             else:
-                return(
+                return (
                     self._track_functions_dic[interaction]["dcounts"](
                         energy, wavelengths
                     ),
                     self._track_functions_dic[interaction]["angles"](
-                        angle_grid,
-                        n,
-                        energy
-                    )
+                        angle_grid, n, energy
+                    ),
                 )
 
     def _em_cascade_fetcher(
-            self, energy,
-            particle: int,
-            wavelengths=config["advanced"]["wavelengths"],
-            angle_grid=config["advanced"]["angles"],
-            n=config["mediums"][
-                config["scenario"]["medium"]]["refractive index"],
-            z_grid=config["advanced"]["z grid"],
-            function=False):
-        """ Fetcher function for a specific particle and energy. This is for
-        em cascades.
+        self,
+        energy: Union[float, np.ndarray],
+        particle: int,
+        wavelengths: np.ndarray = config["advanced"]["wavelengths"],
+        angle_grid: np.ndarray = config["advanced"]["angles"],
+        n: float = config["mediums"][config["scenario"]["medium"]]["refractive index"],
+        z_grid: np.ndarray = config["advanced"]["z grid"],
+        function: bool = False,
+    ) -> Union[
+        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+        Tuple[Callable, Callable, Callable, Callable],
+    ]:
+        """
+        Fetch Cherenkov photon yields for electromagnetic cascades.
 
-       Parameters
+        Parameters
         ----------
-        energy : float
-            The energy(ies) of the particle in GeV
+        energy : float or np.ndarray
+            Cascade energy(ies) in GeV
         particle : int
-            The pdg id of the particle of interest
-        wavelengths : np.array
-            Optional: The desired wavelengths
-        angle_grid : np.array
-            Optional: The desired angles in degress
-        n : float
-            Optional: The refractive index of the medium.
-        z_grid : np.array
-            Optional: The grid in cm for the long. distributions
-        function : bool
-            Optional: returns the functional form instead of the evaluation
+            PDG particle code (11=e±, 22=γ)
+        wavelengths : np.ndarray, optional
+            Wavelength grid in nm
+        angle_grid : np.ndarray, optional
+            Angular grid in degrees
+        n : float, optional
+            Refractive index
+        z_grid : np.ndarray, optional
+            Depth grid in cm
+        function : bool, optional
+            If True, return callables; if False, return arrays
 
         Returns
         -------
-        differential_counts : function/float/np.array
-            dN/dlambda The differential photon counts per track length (in cm).
-            The shape of the array is (len(wavelengths), len(deltaL)).
-        differential_counts_sample : float/np.array
-            A sample of the differential counts distribution. Same shape as
-            the differential counts
-        long_profile : function/float/np.array
-            The distribution along the shower axis for cm
-        angles : function/float/np.array
-            The angular distribution in degrees
+        differential_counts : np.ndarray or Callable
+            dN/dλ per cm [photons/(nm·cm)]
+        differential_counts_sample : np.ndarray or Callable
+            Sampled distribution
+        long_profile : np.ndarray or Callable
+            Longitudinal distribution [1/cm]
+        angles : np.ndarray or Callable
+            Angular distribution [photons/degree]
         """
         if function:
             _log.debug("Fetching em functions for pdg_id " + str(particle))
@@ -208,190 +253,195 @@ class Photon(object):
                 self._em_cascade_function_dic[particle]["dcounts"],
                 self._em_cascade_function_dic[particle]["dcounts sample"],
                 self._em_cascade_function_dic[particle]["long distro"],
-                self._em_cascade_function_dic[particle]["angle distro"]
+                self._em_cascade_function_dic[particle]["angle distro"],
             )
         # Fetching explicit values
         else:
             _log.debug("Fetching track values for " + str(particle))
             if config["general"]["jax"]:
-                return(
-                    np.array([
-                        self._em_cascade_function_dic[particle]["dcounts"](
-                            energy, wavelength
-                        )
-                        for wavelength in wavelengths
-                    ]),
-                    np.array([
-                        self._em_cascade_function_dic[particle][
-                            "dcounts sample"
-                            ](energy, wavelength)
-                        for wavelength in wavelengths
-                    ]),
-                    np.array([
-                        self._em_cascade_function_dic[particle][
-                            "long distro"
-                            ](energy, z)
-                        for z in z_grid
-                    ]),
-                    np.array([
-                        self._em_cascade_function_dic[particle][
-                            "angle distro"](
-                                angle,
-                                n
+                return (
+                    np.array(
+                        [
+                            self._em_cascade_function_dic[particle]["dcounts"](
+                                energy, wavelength
                             )
-                        for angle in angle_grid
-                    ]),
+                            for wavelength in wavelengths
+                        ]
+                    ),
+                    np.array(
+                        [
+                            self._em_cascade_function_dic[particle]["dcounts sample"](
+                                energy, wavelength
+                            )
+                            for wavelength in wavelengths
+                        ]
+                    ),
+                    np.array(
+                        [
+                            self._em_cascade_function_dic[particle]["long distro"](
+                                energy, z
+                            )
+                            for z in z_grid
+                        ]
+                    ),
+                    np.array(
+                        [
+                            self._em_cascade_function_dic[particle]["angle distro"](
+                                angle, n
+                            )
+                            for angle in angle_grid
+                        ]
+                    ),
                 )
             else:
-                return(
-                        self._em_cascade_function_dic[particle]["dcounts"](
-                            energy, wavelengths
-                        ),
-                        self._em_cascade_function_dic[particle][
-                            "dcounts sample"
-                            ](energy, wavelengths),
-                        self._em_cascade_function_dic[particle][
-                            "long distro"
-                            ](energy, z_grid),
-                        self._em_cascade_function_dic[particle][
-                            "angle distro"](
-                                angle_grid,
-                                n
-                            )
+                return (
+                    self._em_cascade_function_dic[particle]["dcounts"](
+                        energy, wavelengths
+                    ),
+                    self._em_cascade_function_dic[particle]["dcounts sample"](
+                        energy, wavelengths
+                    ),
+                    self._em_cascade_function_dic[particle]["long distro"](
+                        energy, z_grid
+                    ),
+                    self._em_cascade_function_dic[particle]["angle distro"](
+                        angle_grid, n
+                    ),
                 )
 
     def _hadron_cascade_fetcher(
-            self, energy,
-            particle: int,
-            wavelengths=config["advanced"]["wavelengths"],
-            angle_grid=config["advanced"]["angles"],
-            n=config["mediums"][
-                config["scenario"]["medium"]]["refractive index"],
-            z_grid=config["advanced"]["z grid"],
-            function=False):
-        """ Fetcher function for a specific particle and energy. This is for
-        hadron cascades.
+        self,
+        energy: Union[float, np.ndarray],
+        particle: int,
+        wavelengths: np.ndarray = config["advanced"]["wavelengths"],
+        angle_grid: np.ndarray = config["advanced"]["angles"],
+        n: float = config["mediums"][config["scenario"]["medium"]]["refractive index"],
+        z_grid: np.ndarray = config["advanced"]["z grid"],
+        function: bool = False,
+    ) -> Union[
+        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+        Tuple[Callable, Callable, Callable, Callable, Callable, Callable],
+    ]:
+        """
+        Fetch Cherenkov photon yields for hadronic cascades.
 
-       Parameters
+        Parameters
         ----------
-        energy : float
-            The energy(ies) of the particle in GeV
+        energy : float or np.ndarray
+            Cascade energy(ies) in GeV
         particle : int
-            The pdg id of the particle of interest
-        wavelengths : np.array
-            Optional: The desired wavelengths
-        angle_grid : np.array
-            Optional: The desired angles in degress
-        n : float
-            Optional: The refractive index of the medium.
-        z_grid : np.array
-            Optional: The grid in cm for the long. distributions
-        function : bool
-            Optional: returns the functional form instead of the evaluation
+            PDG particle code (211=π±, 321=K±, 2212=p, 2112=n)
+        wavelengths : np.ndarray, optional
+            Wavelength grid in nm
+        angle_grid : np.ndarray, optional
+            Angular grid in degrees
+        n : float, optional
+            Refractive index
+        z_grid : np.ndarray, optional
+            Depth grid in cm
+        function : bool, optional
+            If True, return callables; if False, return arrays
 
         Returns
         -------
-        differential_counts : function/float/np.array
-            dN/dlambda The differential photon counts per track length (in cm).
-            The shape of the array is (len(wavelengths), len(deltaL)).
-        differential_counts_sample : float/np.array
-            A sample of the differential counts distribution. Same shape as
-            the differential counts
-        em_fraction_mean : float/np.array
-            The fraction of em particles
-        em_fraction_sample : float/np.array
-            A sample of the em_fraction
-        long_profile : function/float/np.array
-            The distribution along the shower axis for cm
-        angles : function/float/np.array
-            The angular distribution in degrees
+        differential_counts : np.ndarray or Callable
+            dN/dλ per cm [photons/(nm·cm)]
+        differential_counts_sample : np.ndarray or Callable
+            Sampled distribution
+        em_fraction_mean : np.ndarray or Callable
+            Mean EM fraction
+        em_fraction_sample : np.ndarray or Callable
+            Sampled EM fraction
+        long_profile : np.ndarray or Callable
+            Longitudinal distribution [1/cm]
+        angles : np.ndarray or Callable
+            Angular distribution [photons/degree]
         """
         if function:
             _log.debug("Fetching em functions for pdg_id " + str(particle))
             return (
                 self._hadron_cascade_function_dic[particle]["dcounts"],
                 self._hadron_cascade_function_dic[particle]["dcounts sample"],
-                self._hadron_cascade_function_dic[particle][
-                    "em fraction mean"
-                ],
-                self._hadron_cascade_function_dic[particle][
-                    "em fraction sample"
-                ],
+                self._hadron_cascade_function_dic[particle]["em fraction mean"],
+                self._hadron_cascade_function_dic[particle]["em fraction sample"],
                 self._hadron_cascade_function_dic[particle]["long distro"],
-                self._hadron_cascade_function_dic[particle]["angle distro"]
+                self._hadron_cascade_function_dic[particle]["angle distro"],
             )
         # Fetching explicit values
         else:
             _log.debug("Fetching track values for " + str(particle))
             if config["general"]["jax"]:
-                return(
-                    np.array([
-                        self._hadron_cascade_function_dic[particle]["dcounts"](
-                            energy, wavelength
-                        )
-                        for wavelength in wavelengths
-                    ]),
-                    np.array([
-                        self._hadron_cascade_function_dic[particle][
-                            "dcounts sample"
+                return (
+                    np.array(
+                        [
+                            self._hadron_cascade_function_dic[particle]["dcounts"](
+                                energy, wavelength
+                            )
+                            for wavelength in wavelengths
+                        ]
+                    ),
+                    np.array(
+                        [
+                            self._hadron_cascade_function_dic[particle][
+                                "dcounts sample"
                             ](energy, wavelength)
-                        for wavelength in wavelengths
-                    ]),
+                            for wavelength in wavelengths
+                        ]
+                    ),
                     (
-                        self._hadron_cascade_function_dic[particle][
-                            "em fraction mean"
-                            ](energy)
+                        self._hadron_cascade_function_dic[particle]["em fraction mean"](
+                            energy
+                        )
                     ),
                     (
                         self._hadron_cascade_function_dic[particle][
                             "em fraction sample"
-                            ](energy)
+                        ](energy)
                     ),
-                    np.array([
-                        self._hadron_cascade_function_dic[particle][
-                            "long distro"
-                            ](energy, z)
-                        for z in z_grid
-                    ]),
-                    np.array([
-                        self._hadron_cascade_function_dic[particle][
-                            "angle distro"](
-                                energy,
-                                angle,
-                                n
+                    np.array(
+                        [
+                            self._hadron_cascade_function_dic[particle]["long distro"](
+                                energy, z
                             )
-                        for angle in angle_grid
-                    ]),
+                            for z in z_grid
+                        ]
+                    ),
+                    np.array(
+                        [
+                            self._hadron_cascade_function_dic[particle]["angle distro"](
+                                energy, angle, n
+                            )
+                            for angle in angle_grid
+                        ]
+                    ),
                 )
             else:
-                return(
-                        self._hadron_cascade_function_dic[particle]["dcounts"](
-                            energy, wavelengths
-                        ),
-                        self._hadron_cascade_function_dic[particle][
-                            "dcounts sample"
-                            ](energy, wavelengths),
-                        self._hadron_cascade_function_dic[particle][
-                            "em fraction mean"
-                            ](energy),
-                        self._hadron_cascade_function_dic[particle][
-                            "em fraction sample"
-                            ](energy),
-                        self._hadron_cascade_function_dic[particle][
-                            "long distro"
-                            ](energy, z_grid),
-                        self._hadron_cascade_function_dic[particle][
-                            "angle distro"](
-                                energy,
-                                angle_grid,
-                                n
-                            )
+                return (
+                    self._hadron_cascade_function_dic[particle]["dcounts"](
+                        energy, wavelengths
+                    ),
+                    self._hadron_cascade_function_dic[particle]["dcounts sample"](
+                        energy, wavelengths
+                    ),
+                    self._hadron_cascade_function_dic[particle]["em fraction mean"](
+                        energy
+                    ),
+                    self._hadron_cascade_function_dic[particle]["em fraction sample"](
+                        energy
+                    ),
+                    self._hadron_cascade_function_dic[particle]["long distro"](
+                        energy, z_grid
+                    ),
+                    self._hadron_cascade_function_dic[particle]["angle distro"](
+                        energy, angle_grid, n
+                    ),
                 )
+
     ###########################################################################
     # The Builders
 
     def _track_builder(self):
-        """ Builder function for the track functions.
+        """Builder function for the track functions.
 
         Parameters
         ----------
@@ -411,7 +461,7 @@ class Photon(object):
 
             # Building the counts functionn
             def track_mean(energy, interaction=interaction):
-                """ Fetcher function for a specific particle
+                """Fetcher function for a specific particle
                 and energy. This is for tracks
 
                 Parameters
@@ -426,20 +476,17 @@ class Photon(object):
                 counts : float
                     The photon counts
                 """
-                tmp_track_frac = (
-                    self.__track.additional_track_ratio(
-                        energy, interaction=interaction
-                    )
+                tmp_track_frac = self.__track.additional_track_ratio(
+                    energy, interaction=interaction
                 )
-                new_track = self._deltaL * (1. + tmp_track_frac)
+                new_track = self._deltaL * (1.0 + tmp_track_frac)
                 return new_track
+
             if config["general"]["jax"]:
-                _log.debug(
-                    "Constructing Jax function for " + interaction
-                )
+                _log.debug("Constructing Jax function for " + interaction)
 
                 def counts_mean(energy, wavelengths, interaction=interaction):
-                    """ Calculates the differential photon counts.
+                    """Calculates the differential photon counts.
                     Jax implemenation
                     Parameters
                     ----------
@@ -458,13 +505,12 @@ class Photon(object):
                     """
                     new_track = track_mean(energy, interaction=interaction)
                     return self._cherenkov_counts_jax(wavelengths, new_track)
+
                 # jitting
-                counts = jit(counts_mean, static_argnames=['interactions'])
+                counts = jit(counts_mean, static_argnames=["interactions"])
                 angles = jit(self.__track.cherenkov_angle_distro)
             else:
-                _log.debug(
-                    "Constructing Jax function for " + interaction
-                )
+                _log.debug("Constructing Jax function for " + interaction)
 
                 def counts_mean(energy, wavelengths, interaction=interaction):
                     """Calculates the differential photon counts.
@@ -486,6 +532,7 @@ class Photon(object):
                     """
                     new_track = track_mean(energy, interaction=interaction)
                     return self._cherenkov_counts(wavelengths, new_track)
+
                 # No jitting here
                 counts = counts_mean
                 angles = self.__track.cherenkov_angle_distro
@@ -493,7 +540,7 @@ class Photon(object):
             self._track_functions_dic[interaction]["angles"] = angles
 
     def _em_cascade_builder(self):
-        """ Builder function for a the cascade functions. This is for
+        """Builder function for a the cascade functions. This is for
         em cascades.
 
         Parameters
@@ -510,7 +557,7 @@ class Photon(object):
             self._em_cascade_function_dic[particle_id] = {}
 
             def track_mean(energy, name=name):
-                """ Fetcher function for a specific particle and energy.
+                """Fetcher function for a specific particle and energy.
                 This is for em cascades and their photon counts
 
                 Parameters
@@ -525,15 +572,11 @@ class Photon(object):
                 tmp_track : float
                     The track length
                 """
-                tmp_track, _ = (
-                    self.__em_cascade.track_lengths(
-                        energy, name
-                    )
-                )
+                tmp_track, _ = self.__em_cascade.track_lengths(energy, name)
                 return tmp_track
 
             def track_sampler(energy, name=name):
-                """ Fetcher function for a specific particle and energy.
+                """Fetcher function for a specific particle and energy.
                 This samples the distribution
 
                 Parameters
@@ -548,23 +591,15 @@ class Photon(object):
                 tmp_track_sample : float
                     The sampled photon counts
                 """
-                tmp_track, tmp_track_sd = (
-                    self.__em_cascade.track_lengths(
-                        energy, name
-                    )
-                )
+                tmp_track, tmp_track_sd = self.__em_cascade.track_lengths(energy, name)
                 if config["general"]["jax"]:
-                    tmp_track_sample = (
-                        tmp_track + tmp_track_sd * jnormal(self._rstate)
-                    )
+                    tmp_track_sample = tmp_track + tmp_track_sd * jnormal(self._rstate)
                 else:
-                    tmp_track_sample = self._rstate.normal(
-                        tmp_track, tmp_track_sd
-                    )
+                    tmp_track_sample = self._rstate.normal(tmp_track, tmp_track_sd)
                 return tmp_track_sample
 
             def long_profile(energy, z_grid, name=name):
-                """ The longitudinal profile of the em cascade
+                """The longitudinal profile of the em cascade
 
                 Parameters
                 ----------
@@ -583,11 +618,9 @@ class Photon(object):
                 return self.__em_cascade.long_profile(energy, z_grid, name)
 
             def angle_distro(
-                    angles,
-                    n=config["mediums"][self._medium]["refractive index"],
-                    name=name
-                    ):
-                """ The angle distribution of the cherenkov photons for
+                angles, n=config["mediums"][self._medium]["refractive index"], name=name
+            ):
+                """The angle distribution of the cherenkov photons for
                 the em cascade
 
                 Parameters
@@ -604,14 +637,11 @@ class Photon(object):
                 angle_distro : float/np.array
                     The resulting longitudinal distribution
                 """
-                return self.__em_cascade.cherenkov_angle_distro(
-                    angles, n, name
-                )
+                return self.__em_cascade.cherenkov_angle_distro(angles, n, name)
+
             # Storing the functions
             if config["general"]["jax"]:
-                _log.debug(
-                    "Constructing Jax function for pdg_id " + str(name)
-                )
+                _log.debug("Constructing Jax function for pdg_id " + str(name))
 
                 def counts_mean(energy, wavelengths, name=name):
                     """Calculates the differential photon counts.
@@ -656,15 +686,14 @@ class Photon(object):
                     """
                     new_track = track_sampler(energy, name=name)
                     return self._cherenkov_counts_jax(wavelengths, new_track)
+
                 # Jit the jax functions
-                counts = jit(counts_mean, static_argnames=['name'])
-                counts_sample = jit(counts_sampler, static_argnames=['name'])
-                long = jit(long_profile, static_argnames=['name'])
-                angles = jit(angle_distro, static_argnames=['name'])
+                counts = jit(counts_mean, static_argnames=["name"])
+                counts_sample = jit(counts_sampler, static_argnames=["name"])
+                long = jit(long_profile, static_argnames=["name"])
+                angles = jit(angle_distro, static_argnames=["name"])
             else:
-                _log.debug(
-                    "Constructing numpy function for pdg_id " + str(name)
-                )
+                _log.debug("Constructing numpy function for pdg_id " + str(name))
 
                 def counts_mean(energy, wavelengths, name=name):
                     """Calculates the differential photon counts.
@@ -709,6 +738,7 @@ class Photon(object):
                     """
                     new_track = track_sampler(energy, name=name)
                     return self._cherenkov_counts(wavelengths, new_track)
+
                 # Don't jist the numpy functions
                 counts = counts_mean
                 counts_sample = counts_sampler
@@ -723,7 +753,7 @@ class Photon(object):
             }
 
     def _hadron_cascade_builder(self):
-        """ Builder function for a hadronic cascades.
+        """Builder function for a hadronic cascades.
 
         Parameters
         ----------
@@ -740,7 +770,7 @@ class Photon(object):
             self._hadron_cascade_function_dic[particle_id] = {}
 
             def track_mean(energy, name=name):
-                """ Fetcher function for a specific particle and energy.
+                """Fetcher function for a specific particle and energy.
                 This is for hadron cascades and their photon counts
 
                 Parameters
@@ -755,15 +785,11 @@ class Photon(object):
                 tmp_track : float
                     The track length
                 """
-                tmp_track, _ = (
-                    self.__hadron_cascade.track_lengths(
-                        energy, name
-                    )
-                )
+                tmp_track, _ = self.__hadron_cascade.track_lengths(energy, name)
                 return tmp_track
 
             def track_sampler(energy, name=name):
-                """ Fetcher function for a specific particle and energy.
+                """Fetcher function for a specific particle and energy.
                 This samples the distribution
 
                 Parameters
@@ -778,23 +804,17 @@ class Photon(object):
                 tmp_track_sample : float
                     The sampled photon counts
                 """
-                tmp_track, tmp_track_sd = (
-                    self.__hadron_cascade.track_lengths(
-                        energy, name
-                    )
+                tmp_track, tmp_track_sd = self.__hadron_cascade.track_lengths(
+                    energy, name
                 )
                 if config["general"]["jax"]:
-                    tmp_track_sample = (
-                        tmp_track + tmp_track_sd * jnormal(self._rstate)
-                    )
+                    tmp_track_sample = tmp_track + tmp_track_sd * jnormal(self._rstate)
                 else:
-                    tmp_track_sample = self._rstate.normal(
-                        tmp_track, tmp_track_sd
-                    )
+                    tmp_track_sample = self._rstate.normal(tmp_track, tmp_track_sd)
                 return tmp_track_sample
 
             def em_fraction_mean(energy, name=name):
-                """ The em fraction mean of the hadron cascade
+                """The em fraction mean of the hadron cascade
 
                 Parameters
                 ----------
@@ -808,13 +828,11 @@ class Photon(object):
                 em_frac_mean : float/np.array
                     The resulting em fraction
                 """
-                em_frac_mean, _ = (
-                    self.__hadron_cascade.em_fraction(energy, name)
-                )
+                em_frac_mean, _ = self.__hadron_cascade.em_fraction(energy, name)
                 return em_frac_mean
 
             def em_fraction_sampler(energy, name=name):
-                """ The em fraction sample of the hadron cascade
+                """The em fraction sample of the hadron cascade
 
                 Parameters
                 ----------
@@ -828,21 +846,17 @@ class Photon(object):
                 em_frac_sample : float/np.array
                     The resulting em fraction
                 """
-                em_frac_mean, em_frac_std = (
-                    self.__hadron_cascade.em_fraction(energy, name)
+                em_frac_mean, em_frac_std = self.__hadron_cascade.em_fraction(
+                    energy, name
                 )
                 if config["general"]["jax"]:
-                    em_frac_sample = (
-                        em_frac_mean + em_frac_std * jnormal(self._rstate)
-                    )
+                    em_frac_sample = em_frac_mean + em_frac_std * jnormal(self._rstate)
                 else:
-                    em_frac_sample = self._rstate.normal(
-                        em_frac_mean, em_frac_std
-                    )
+                    em_frac_sample = self._rstate.normal(em_frac_mean, em_frac_std)
                 return em_frac_sample
 
             def long_profile(energy, z_grid, name=name):
-                """ The longitudinal profile of the hadron cascade
+                """The longitudinal profile of the hadron cascade
 
                 Parameters
                 ----------
@@ -861,12 +875,12 @@ class Photon(object):
                 return self.__hadron_cascade.long_profile(energy, z_grid, name)
 
             def angle_distro(
-                    energy,
-                    angles,
-                    n=config["mediums"][self._medium]["refractive index"],
-                    name=name
-                    ):
-                """ The angle distribution of the cherenkov photons for
+                energy,
+                angles,
+                n=config["mediums"][self._medium]["refractive index"],
+                name=name,
+            ):
+                """The angle distribution of the cherenkov photons for
                 the hadron cascade
 
                 Parameters
@@ -886,11 +900,10 @@ class Photon(object):
                 return self.__hadron_cascade.cherenkov_angle_distro(
                     energy, angles, n, name
                 )
+
             # Storing the functions
             if config["general"]["jax"]:
-                _log.debug(
-                    "Constructing Jax function for pdg_id " + str(name)
-                )
+                _log.debug("Constructing Jax function for pdg_id " + str(name))
 
                 def counts_mean(energy, wavelengths, name=name):
                     """Calculates the differential photon counts.
@@ -935,20 +948,16 @@ class Photon(object):
                     """
                     new_track = track_sampler(energy, name=name)
                     return self._cherenkov_counts_jax(wavelengths, new_track)
+
                 # Jit the jax functions
-                counts = jit(counts_mean, static_argnames=['name'])
-                counts_sample = jit(counts_sampler, static_argnames=['name'])
-                em_frac_mean = jit(em_fraction_mean, static_argnames=['name'])
-                em_frac_sample = jit(
-                    em_fraction_sampler,
-                    static_argnames=['name']
-                )
-                long = jit(long_profile, static_argnames=['name'])
-                angles = jit(angle_distro, static_argnames=['name'])
+                counts = jit(counts_mean, static_argnames=["name"])
+                counts_sample = jit(counts_sampler, static_argnames=["name"])
+                em_frac_mean = jit(em_fraction_mean, static_argnames=["name"])
+                em_frac_sample = jit(em_fraction_sampler, static_argnames=["name"])
+                long = jit(long_profile, static_argnames=["name"])
+                angles = jit(angle_distro, static_argnames=["name"])
             else:
-                _log.debug(
-                    "Constructing numpy function for pdg_id " + str(name)
-                )
+                _log.debug("Constructing numpy function for pdg_id " + str(name))
 
                 def counts_mean(energy, wavelengths, name=name):
                     """Calculates the differential photon counts.
@@ -993,6 +1002,7 @@ class Photon(object):
                     """
                     new_track = track_sampler(energy, name=name)
                     return self._cherenkov_counts(wavelengths, new_track)
+
                 # Don't jist the numpy functions
                 counts = counts_mean
                 counts_sample = counts_sampler
@@ -1010,10 +1020,8 @@ class Photon(object):
                 "angle distro": angles,
             }
 
-    def _cherenkov_counts(
-            self,
-            wavelengths: np.array, track_length: float) -> np.array:
-        """ Calculates the differential number of photons for the given
+    def _cherenkov_counts(self, wavelengths: np.array, track_length: float) -> np.array:
+        """Calculates the differential number of photons for the given
         wavelengths and track-lengths assuming a constant velocity with beta=1.
 
         Parameters
@@ -1029,20 +1037,19 @@ class Photon(object):
             A array filled witht the produced photons.
         """
         prefac = (
-            2. * np.pi * self._alpha * self._charge**2. /
-            (1. - 1. / self._n**2.)
+            2.0 * np.pi * self._alpha * self._charge**2.0 / (1.0 - 1.0 / self._n**2.0)
         )
         # 1e-7 due to the conversion from nm to cm
-        diff_counts = np.array([
-            prefac / (lambd * 1e-9)**2. * track_length * 1e-2
-            for lambd in wavelengths
-        ])
+        diff_counts = np.array(
+            [
+                prefac / (lambd * 1e-9) ** 2.0 * track_length * 1e-2
+                for lambd in wavelengths
+            ]
+        )
         return diff_counts * 1e-9
 
-    def _cherenkov_counts_jax(
-            self,
-            wavelengths: float, track_lengths: float) -> float:
-        """ Calculates the differential number of photons for the given
+    def _cherenkov_counts_jax(self, wavelengths: float, track_lengths: float) -> float:
+        """Calculates the differential number of photons for the given
         wavelengths and track-lengths assuming a constant velocity with beta=1.
 
         Parameters
@@ -1058,11 +1065,8 @@ class Photon(object):
             The counts (differential)
         """
         prefac = (
-            2. * jnp.pi * self._alpha * self._charge**2. /
-            (1. - 1. / self._n**2.)
+            2.0 * jnp.pi * self._alpha * self._charge**2.0 / (1.0 - 1.0 / self._n**2.0)
         )
         # 1e-7 due to the conversion from nm to cm
-        diff_counts = (
-            prefac / (wavelengths * 1e-9)**2. * track_lengths * 1e-2
-        )
+        diff_counts = prefac / (wavelengths * 1e-9) ** 2.0 * track_lengths * 1e-2
         return diff_counts * 1e-9

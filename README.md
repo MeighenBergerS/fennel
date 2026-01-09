@@ -50,7 +50,7 @@ Please cite this [software](https://github.com/MeighenBergerS/fennel) using
   author = {Stephan Meighen-Berger},
   title = {{Fennel}: Light from tracks and cascades,
   url = {https://github.com/MeighenBergerS/fennel},
-  version = {1.3.4},
+  version = {2.0.0},
   year = {2022},
 }
 ```

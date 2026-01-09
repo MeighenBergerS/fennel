@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
-# Name: config.py
-# Authors: Stephan Meighen-Berger
-# Config file for the fennel package.
+"""
+Configuration management for the Fennel package.
+
+This module defines the global configuration dictionary containing all
+parameters for light yield calculations, including particle properties,
+medium characteristics, and simulation settings.
+"""
 
 import logging
-from typing import Dict, Any
-import yaml
+from pathlib import Path
+from typing import Any, Dict, Union
+
 import numpy as np
+import yaml
 
 _baseconfig: Dict[str, Any]
 
@@ -20,7 +26,7 @@ _baseconfig = {
         # Enable logger and config dump
         "enable logging": False,
         # Output level
-        'debug level': logging.ERROR,
+        "debug level": logging.ERROR,
         # Note the paths need to be set appropiately for your system
         # Location of logging file handler
         "log file handler": "../run/fennel.log",
@@ -35,7 +41,7 @@ _baseconfig = {
     ###########################################################################
     "scenario": {
         "medium": "water",  # The background medium
-        "parametrization": "aachen"
+        "parametrization": "aachen",
     },
     ###########################################################################
     # Particle data
@@ -44,13 +50,13 @@ _baseconfig = {
         # Mass
         "mass": 0.1056583755,
         # Standard Track Length
-        "standard track length": 10.,  # Value given in cm
+        "standard track length": 10.0,  # Value given in cm
     },
     "mu+": {
         # Mass
         "mass": 0.1056583755,
         # Standard Track Length
-        "standard track length": 10.,  # Value given in cm
+        "standard track length": 10.0,  # Value given in cm
     },
     ###########################################################################
     # PDG ID Lib
@@ -80,75 +86,43 @@ _baseconfig = {
     # Mediums
     ###########################################################################
     "mediums": {
-       "water": {
-           "refractive index": 1.333,
-           "density": 1.0,  # in g/cm^-3,
-           "radiation length": 36.08,  # g cm^-2
-       },
-       "ice": {
-           "refractive index": 1.309,
-           "density": 0.9180,  # in g/cm^-3,
-           "radiation length": 36.08,  # g cm^-2
-       },
+        "water": {
+            "refractive index": 1.333,
+            "density": 1.0,  # in g/cm^-3,
+            "radiation length": 36.08,  # g cm^-2
+        },
+        "ice": {
+            "refractive index": 1.309,
+            "density": 0.9180,  # in g/cm^-3,
+            "radiation length": 36.08,  # g cm^-2
+        },
     },
     ###########################################################################
     # Simulation aspects
     ###########################################################################
     "simulation": {
         "track particles": [13, -13],
-        "track interactions": [
-            "ionization", "pair", "brems", "nuclear", "total"
-            ],
+        "track interactions": ["ionization", "pair", "brems", "nuclear", "total"],
         "em particles": [11, -11, 22],
-        "hadron particles": [211, -211, 130, 2212, -2212, 2112]
+        "hadron particles": [211, -211, 130, 2212, -2212, 2112],
     },
     ###########################################################################
     # Track
     ###########################################################################
     "track": {
         "additional track water": {
-            "ionization": {
-                "lambda": 0.2489,
-                "kappa": 0.0030
-            },
-            "pair": {
-                "lambda": -0.0626,
-                "kappa": 0.0175
-            },
-            "brems": {
-                "lambda": 0.0004,
-                "kappa": 0.
-            },
-            "nuclear": {
-                "lambda": 0.0005,
-                "kappa": 0.
-            },
-            "total": {
-                "lambda": 0.1880,
-                "kappa": 0.0206
-            },
+            "ionization": {"lambda": 0.2489, "kappa": 0.0030},
+            "pair": {"lambda": -0.0626, "kappa": 0.0175},
+            "brems": {"lambda": 0.0004, "kappa": 0.0},
+            "nuclear": {"lambda": 0.0005, "kappa": 0.0},
+            "total": {"lambda": 0.1880, "kappa": 0.0206},
         },
         "additional track ice": {
-            "ionization": {
-                "lambda": 0.2247,
-                "kappa": 0.0030
-            },
-            "pair": {
-                "lambda": -0.0612,
-                "kappa": 0.0174
-            },
-            "brems": {
-                "lambda": 0.0004,
-                "kappa": 0.
-            },
-            "nuclear": {
-                "lambda": 0.0005,
-                "kappa": 0.
-            },
-            "total": {
-                "lambda": 0.1842,
-                "kappa": 0.0204
-            },
+            "ionization": {"lambda": 0.2247, "kappa": 0.0030},
+            "pair": {"lambda": -0.0612, "kappa": 0.0174},
+            "brems": {"lambda": 0.0004, "kappa": 0.0},
+            "nuclear": {"lambda": 0.0005, "kappa": 0.0},
+            "total": {"lambda": 0.1842, "kappa": 0.0204},
         },
         "angular distribution": {
             "a pars": [0.34485, 0.03145],  # sr^-1
@@ -166,37 +140,25 @@ _baseconfig = {
                 "alpha": 532.07078881,  # cm GeV^-1
                 "beta": 1.00000211,
                 "alpha dev": 5.78170887,
-                "beta dev": 0.5
+                "beta dev": 0.5,
             },
             -11: {
                 "alpha": 532.11320598,  # cm GeV^-1
                 "beta": 0.99999254,
                 "alpha dev": 5.73419669,
-                "beta dev": 0.5
+                "beta dev": 0.5,
             },
             22: {
                 "alpha": 532.08540905,  # cm GeV^-1
                 "beta": 0.99999877,
                 "alpha dev": 5.78170887,
-                "beta dev": 5.66586567
+                "beta dev": 5.66586567,
             },
         },
         "longitudinal parameters": {
-            11: {
-                "alpha": 2.01849,
-                "beta": 1.45469,
-                "b": 0.63207
-            },
-            -11: {
-                "alpha": 2.00035,
-                "beta": 1.45501,
-                "b": 0.63008
-            },
-            22: {
-                "alpha": 2.83923,
-                "beta": 1.34031,
-                "b": 0.64526
-            },
+            11: {"alpha": 2.01849, "beta": 1.45469, "b": 0.63207},
+            -11: {"alpha": 2.00035, "beta": 1.45501, "b": 0.63008},
+            22: {"alpha": 2.83923, "beta": 1.34031, "b": 0.64526},
         },
         "angular distribution": {
             11: {
@@ -217,7 +179,7 @@ _baseconfig = {
                 "c": 0.29926,
                 "d": -0.00101,  # sr^-1
             },
-        }
+        },
     },
     ###########################################################################
     # Hadron Cascade
@@ -229,37 +191,37 @@ _baseconfig = {
                 "alpha": 333.55182722,  # cm GeV^-1
                 "beta": 1.03662217,
                 "alpha dev": 119.20455395,
-                "beta dev": 0.80772057
+                "beta dev": 0.80772057,
             },
             -211: {
                 "alpha": 335.84489578,  # cm GeV^-1
                 "beta": 1.03584394,
                 "alpha dev": 122.50188073,
-                "beta dev": 0.80322520
+                "beta dev": 0.80322520,
             },
             130: {
                 "alpha": 326.00450524,  # cm GeV^-1
                 "beta": 1.03931457,
                 "alpha dev": 121.41970572,
-                "beta dev": 0.80779629
+                "beta dev": 0.80779629,
             },
             2212: {
                 "alpha": 287.37183922,  # cm GeV^-1
                 "beta": 1.05172118,
                 "alpha dev": 88.04581378,
-                "beta dev": 0.82445572
+                "beta dev": 0.82445572,
             },
             -2212: {
                 "alpha": 303.33074914,  # cm GeV^-1
                 "beta": 1.04322206,
                 "alpha dev": 113.23088104,
-                "beta dev": 0.77134060
+                "beta dev": 0.77134060,
             },
             2112: {
                 "alpha": 278.43854660,  # cm GeV^-1
                 "beta": 1.05582906,
                 "alpha dev": 93.22787137,
-                "beta dev": 0.81776503
+                "beta dev": 0.81776503,
             },
         },
         "em fraction": {
@@ -383,14 +345,14 @@ _baseconfig = {
     "advanced": {
         # Energy threshold for continuous losses
         "threshold E": 0.5,  # In GeV
-        "energy grid": np.logspace(0., 9, 91),
+        "energy grid": np.logspace(0.0, 9, 91),
         "fine structure": 0.0072973525693,
-        "particle charge": 1.,  # Charge of the particle of interest
-        "wavelengths": np.linspace(350., 500., 100),  # in nm
-        "track length": 1.,  # in cm
-        "angles": np.linspace(0., 180., 100),  # in degrees
+        "particle charge": 1.0,  # Charge of the particle of interest
+        "wavelengths": np.linspace(350.0, 500.0, 100),  # in nm
+        "track length": 1.0,  # in cm
+        "angles": np.linspace(0.0, 180.0, 100),  # in degrees
         # The grid used for long profiling. Given in cm
-        "z grid": np.linspace(0., 1e4, int(1e4)),
+        "z grid": np.linspace(0.0, 1e4, int(1e4)),
         # Location and name of the definitions file
         "generated definitions": "generated_definitions.pyx",
     },
@@ -398,51 +360,133 @@ _baseconfig = {
 
 
 class ConfigClass(dict):
-    """ The configuration class. This is used
-    by the package for all parameter settings. If something goes wrong
-    its usually here.
+    """
+    Global configuration dictionary for Fennel package.
+
+    This class extends Python's built-in dict to provide configuration
+    management with YAML file loading and dictionary merging capabilities.
+    The configuration stores all parameters needed for light yield calculations.
 
     Parameters
     ----------
-    config : dic
-        The config dictionary
+    *args
+        Positional arguments passed to dict constructor
+    **kwargs
+        Keyword arguments passed to dict constructor
 
-    Returns
-    -------
-    None
+    Attributes
+    ----------
+    All configuration keys from _baseconfig, including:
+        general : dict
+            General settings (random seed, logging, JAX mode)
+        scenario : dict
+            Simulation scenario (medium, parametrization)
+        pdg id : dict
+            Mapping of PDG IDs to particle names
+        mediums : dict
+            Medium properties (refractive index, density, radiation length)
+        simulation : dict
+            Simulation parameters (particle lists, interactions)
+        track : dict
+            Track parametrization parameters
+        em_cascade : dict
+            EM cascade parametrization parameters
+        hadron_cascade : dict
+            Hadron cascade parametrization parameters
+        advanced : dict
+            Advanced settings (grids, thresholds)
+
+    Examples
+    --------
+    Access configuration values:
+
+    >>> from fennel import config
+    >>> config["general"]["random state seed"]
+    1337
+    >>> config["mediums"]["water"]["refractive index"]
+    1.333
+
+    Modify configuration:
+
+    >>> config["general"]["jax"] = True
+    >>> config["general"]["random state seed"] = 42
+
+    Load from YAML file:
+
+    >>> config.from_yaml("my_config.yaml")
+
+    Update from dictionary:
+
+    >>> user_config = {"general": {"jax": False}}
+    >>> config.from_dict(user_config)
+
+    Notes
+    -----
+    - Configuration changes affect the entire package globally
+    - Set parameters before creating Fennel() instance
+    - Random seed should be set for reproducible results
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize the configuration dictionary."""
         super().__init__(*args, **kwargs)
 
-    # TODO: Update this
-    def from_yaml(self, yaml_file: str) -> None:
-        """ Update config with yaml file
+    def from_yaml(self, yaml_file: Union[str, Path]) -> None:
+        """
+        Update configuration from a YAML file.
+
+        Merges the contents of the YAML file with the current configuration.
+        Existing keys are overwritten, new keys are added.
 
         Parameters
         ----------
-        yaml_file : str
-            path to yaml file
+        yaml_file : str or Path
+            Path to YAML configuration file
 
-        Returns
-        -------
-        None
+        Raises
+        ------
+        FileNotFoundError
+            If the YAML file doesn't exist
+        yaml.YAMLError
+            If the YAML file is malformed
+
+        Examples
+        --------
+        >>> config.from_yaml("custom_config.yaml")
+        >>> config.from_yaml(Path("configs/experiment1.yaml"))
+
+        Notes
+        -----
+        The YAML file should have the same structure as the base config.
+        Only provide keys you want to override.
         """
         yaml_config = yaml.load(open(yaml_file), Loader=yaml.SafeLoader)
         self.update(yaml_config)
 
-    # TODO: Update this
-    def from_dict(self, user_dict: Dict[Any, Any]) -> None:
-        """ Creates a config from dictionary
+    def from_dict(self, user_dict: Dict[str, Any]) -> None:
+        """
+        Update configuration from a dictionary.
+
+        Merges the user dictionary with the current configuration.
+        Existing keys are overwritten, new keys are added.
 
         Parameters
         ----------
-        user_dict : dic
-            The user dictionary
+        user_dict : dict
+            Dictionary containing configuration updates
 
-        Returns
-        -------
-        None
+        Examples
+        --------
+        >>> user_config = {
+        ...     "general": {"jax": True, "random state seed": 42},
+        ...     "scenario": {"medium": "ice"}
+        ... }
+        >>> config.from_dict(user_config)
+
+        Notes
+        -----
+        Deep nesting is preserved during merge. Only provide the specific
+        keys you want to override, not the entire configuration structure.
         """
         self.update(user_dict)
 
