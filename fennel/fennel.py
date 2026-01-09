@@ -445,7 +445,7 @@ class Fennel:
         >>> wavelengths = np.linspace(300, 600, 100)
         >>> energy = 100.0  # GeV
         >>> dcounts, angles = fennel.track_yields(energy, wavelengths=wavelengths)
-        >>> total_photons_per_cm = np.trapezoid(dcounts, wavelengths)
+        >>> total_photons_per_cm = integrate_trapezoid(dcounts, wavelengths)
 
         Get functional form for later evaluation:
 
@@ -551,7 +551,7 @@ class Fennel:
         >>> dcounts, dcounts_sample, long_prof, angles = fennel.em_yields(
         ...     energy, particle=11, wavelengths=wavelengths
         ... )
-        >>> total_photons = np.trapezoid(dcounts, wavelengths)
+        >>> total_photons = integrate_trapezoid(dcounts, wavelengths)
 
         Compare electron and positron yields:
 
@@ -743,7 +743,7 @@ class Fennel:
         >>> result = fennel.track_yields_v2(100.0)
         >>> print(result)
         TrackYieldResult(energy=100.0 GeV, interaction='total', mode=array)
-        >>> total_photons = np.trapezoid(result.dcounts, wavelengths)
+        >>> total_photons = integrate_trapezoid(result.dcounts, wavelengths)
 
         See Also
         --------

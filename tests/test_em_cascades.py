@@ -9,6 +9,7 @@ import pytest
 
 from fennel import config
 from fennel.em_cascades import EM_Cascade
+from tests.conftest import trapezoid_compat
 
 
 @pytest.mark.unit
@@ -64,7 +65,7 @@ class TestEMCascade:
         assert np.all(profile >= 0)
 
         # Profile should integrate to something reasonable
-        integral = np.trapezoid(profile, z_grid)
+        integral = trapezoid_compat(profile, z_grid)
         assert integral > 0
 
     def test_longitudinal_profile_peak(self):

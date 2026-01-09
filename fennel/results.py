@@ -45,7 +45,7 @@ class TrackYieldResult:
     Examples
     --------
     >>> result = fennel.track_yields_v2(100.0)
-    >>> total_photons = np.trapezoid(result.dcounts, wavelengths)
+    >>> total_photons = integrate_trapezoid(result.dcounts, wavelengths)
     >>> print(f"Energy: {result.energy} GeV")
     >>> print(f"Interaction: {result.interaction}")
     """

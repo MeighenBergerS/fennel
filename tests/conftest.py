@@ -8,6 +8,18 @@ import pytest
 from fennel import Fennel, config
 
 
+def trapezoid_compat(y, x=None, dx=None, axis=-1):
+    """
+    Backward-compatible trapezoid integration helper.
+
+    Works with NumPy <2.0 (trapz) and NumPy 2.0+ (trapezoid).
+    """
+    if hasattr(np, "trapezoid"):
+        return np.trapezoid(y, x=x, dx=dx, axis=axis)
+    else:
+        return np.trapz(y, x=x, dx=dx, axis=axis)
+
+
 @pytest.fixture(scope="session")
 def reset_config():
     """Reset config to default state after tests."""

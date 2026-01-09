@@ -9,6 +9,7 @@ import pytest
 
 from fennel import config
 from fennel.tracks import Track
+from tests.conftest import trapezoid_compat
 
 
 @pytest.mark.unit
@@ -65,7 +66,7 @@ class TestTrack:
         assert np.all(angle_dist >= 0)
 
         # Check normalization (should integrate to something reasonable)
-        integral = np.trapezoid(angle_dist, angles)
+        integral = trapezoid_compat(angle_dist, angles)
         assert integral > 0
 
     def test_track_ratio_energy_dependence(self):

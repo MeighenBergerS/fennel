@@ -16,6 +16,7 @@ import numpy as np
 import pytest
 
 from fennel import Fennel, config
+from tests.conftest import trapezoid_compat
 
 # Reference values computed with v1.3.4
 # These are the GOLD STANDARD values that must be preserved
@@ -398,7 +399,7 @@ def save_reference_values(filename="tests/reference_values_v1.3.4.json"):
                 ref["energy"], ref["particle"], wavelengths=wavelengths, function=False
             )
             ref["expected_dcounts"] = float(dcounts[wavelength_idx])
-            ref["expected_integral"] = float(np.trapezoid(dcounts, wavelengths))
+            ref["expected_integral"] = float(trapezoid_compat(dcounts, wavelengths))
             print(
                 f"  {key}: dcounts={ref['expected_dcounts']:.6e}, integral={ref['expected_integral']:.6e}"
             )
@@ -410,7 +411,7 @@ def save_reference_values(filename="tests/reference_values_v1.3.4.json"):
             )
             ref["expected_dcounts"] = float(dcounts[wavelength_idx])
             ref["expected_em_fraction"] = float(em_frac)
-            ref["expected_integral"] = float(np.trapezoid(dcounts, wavelengths))
+            ref["expected_integral"] = float(trapezoid_compat(dcounts, wavelengths))
             print(
                 f"  {key}: dcounts={ref['expected_dcounts']:.6e}, em_frac={ref['expected_em_fraction']:.4f}, integral={ref['expected_integral']:.6e}"
             )
@@ -502,7 +503,7 @@ class TestPhysicsRegression:
         )
 
         actual_dcounts = dcounts[wavelength_idx]
-        actual_integral = np.trapezoid(dcounts, wavelengths)
+        actual_integral = trapezoid_compat(dcounts, wavelengths)
 
         fennel.close()
 
@@ -536,7 +537,7 @@ class TestPhysicsRegression:
 
         actual_dcounts = dcounts[wavelength_idx]
         actual_em_frac = em_frac
-        actual_integral = np.trapezoid(dcounts, wavelengths)
+        actual_integral = trapezoid_compat(dcounts, wavelengths)
 
         fennel.close()
 
@@ -565,7 +566,7 @@ class TestPhysicsRegression:
             dcounts, _ = fennel.track_yields(
                 energy, wavelengths=wavelengths, function=False
             )
-            integral = np.trapezoid(dcounts, wavelengths)
+            integral = trapezoid_compat(dcounts, wavelengths)
 
             # Check monotonicity (higher energy -> more light)
             if prev_integral is not None:

@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 from fennel import Fennel, config
+from tests.conftest import trapezoid_compat
 
 
 @pytest.mark.integration
@@ -235,6 +236,6 @@ class TestFennelIntegration:
             energy, wavelengths=test_wavelengths, function=False
         )
 
-        total_counts = np.trapezoid(dcounts, test_wavelengths)
+        total_counts = trapezoid_compat(dcounts, test_wavelengths)
         assert total_counts > 0
         assert np.isfinite(total_counts)
