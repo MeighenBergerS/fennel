@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- PR guidance: new documentation at `docs-mkdocs/development/pr-guide.md` outlining branching, testing, changelog, and review expectations
+
 ## [2.0.0] - 2026-01-09
 
 ### Added

@@ -154,6 +154,10 @@ pre-commit run --all-files
 pre-commit run nbstripout --all-files
 ```
 
+### Pull requests
+
+See [docs-mkdocs/development/pr-guide.md](docs-mkdocs/development/pr-guide.md) for the branching, testing, and review checklist.
+
 ## Beta <a name="beta"></a>
 
 Fennel offers a few subprojects which are currently still in beta. While these projects work, they have as of yet not been designed for usability. Currently available subprojects are available offer the GitHub repository (not pip!). Subprojects are:
