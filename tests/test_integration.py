@@ -7,7 +7,6 @@ Tests the full workflow and public API.
 import numpy as np
 import pytest
 
-from fennel import Fennel, config
 from tests.conftest import trapezoid_compat
 
 
@@ -181,8 +180,6 @@ class TestFennelIntegration:
 
     def test_multiple_energies(self, fennel_instance, test_energies):
         """Test handling of multiple energy values."""
-        particle = 13
-
         for energy in test_energies:
             dcounts, angles = fennel_instance.track_yields(energy, function=False)
             assert np.all(np.isfinite(dcounts))

@@ -20,13 +20,11 @@ from .tracks import Track
 
 try:
     import jax.numpy as jnp
-    from jax import Array as JaxArray
     from jax import jit
     from jax.random import normal as jnormal
 except ImportError:
     jnp = None
     jit = None
-    JaxArray = None
     jnormal = None
     if config["general"]["jax"]:
         raise ImportError("JAX not found! Install with: pip install jax jaxlib")

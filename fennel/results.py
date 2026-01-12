@@ -18,10 +18,6 @@ from typing import Callable, Union
 
 import numpy as np
 
-try:
-    from jax import Array as JaxArray
-except ImportError:
-    JaxArray = None
 
 
 @dataclass

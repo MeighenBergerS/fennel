@@ -36,10 +36,9 @@ from .validation import (
 )
 
 try:
-    from jax import Array as JaxArray
     from jax.random import PRNGKey
 except ImportError:
-    JaxArray = None
+    PRNGKey = None
     if config["general"]["jax"]:
         raise ImportError("JAX not found! Install with: pip install jax jaxlib")
 
