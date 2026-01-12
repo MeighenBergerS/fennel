@@ -6,7 +6,6 @@ import tempfile
 
 import numpy as np
 import pytest
-import yaml
 
 from fennel import config
 from fennel.config import ConfigClass
