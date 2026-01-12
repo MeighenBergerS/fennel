@@ -6,8 +6,16 @@ fennel.log
 .ipynb_checkpoints
 
 venv3
+venv
+.venv
+.venv_v2test/
+
+# Common virtualenv patterns (keep minimal scope)
+venv*/
+.venv*/
 
 *.json
+!tests/reference_values_v1.3.4.json
 
 Fennel.egg-info
 fennel_seed.egg-info
@@ -17,3 +25,4 @@ dist
 *.pyx
 *.pyd
 *.csv
+site/
