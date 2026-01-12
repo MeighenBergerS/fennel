@@ -50,9 +50,16 @@ test = [
     "pytest-cov>=3.0.0",
     "pytest-xdist>=2.5.0"
 ]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.24.0",
+    "pymdown-extensions>=10.0"
+]
 dev = [
     "fennel_seed[test]",
     "fennel_seed[interactive]",
+    "fennel_seed[docs]",
     "black>=22.0.0",
     "flake8>=4.0.0",
     "isort>=5.10.0",
@@ -63,6 +70,7 @@ all = [
     "fennel_seed[interactive]",
     "fennel_seed[jax]",
     "fennel_seed[test]",
+    "fennel_seed[docs]",
     "fennel_seed[dev]"
 ]
 
@@ -125,3 +133,25 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
 ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["fennel"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/site-packages/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if False:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod"
+]

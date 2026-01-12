@@ -85,13 +85,9 @@ nav:
   - Getting Started:
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quickstart.md
-    - Basic Examples: getting-started/examples.md
+    - Upgrade Guide: getting-started/upgrade-guide.md
   - User Guide:
     - Configuration: user-guide/configuration.md
-    - Tracks: user-guide/tracks.md
-    - EM Cascades: user-guide/em-cascades.md
-    - Hadron Cascades: user-guide/hadron-cascades.md
-    - Advanced Usage: user-guide/advanced.md
   - API Reference:
     - Fennel: api/fennel.md
     - Config: api/config.md
@@ -100,12 +96,11 @@ nav:
     - EM Cascades: api/em_cascades.md
     - Hadron Cascades: api/hadron_cascades.md
     - Photons: api/photons.md
-  - Physics Background:
-    - Cherenkov Radiation: physics/cherenkov.md
-    - Parametrizations: physics/parametrizations.md
   - Development:
     - Contributing: development/contributing.md
     - Testing: development/testing.md
+    - PR Guide: development/pr-guide.md
+    - Commit Guide: development/commit-guide.md
   - About:
     - Citation: about/citation.md
     - License: about/license.md

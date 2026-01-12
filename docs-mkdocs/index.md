@@ -1,7 +1,7 @@
 # Fennel
 
 <p align="center">
-  <img src="../images/Fennel.png" alt="Fennel Logo" width="300"/>
+  <img src="assets/Fennel.png" alt="Fennel Logo" width="300"/>
 </p>
 
 **Cherenkov light yield simulation for particles and cascades**

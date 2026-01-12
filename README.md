@@ -1,167 +1,328 @@
+<img src="docs-mkdocs/assets/Fennel.png" alt="Fennel logo" width="180" />
+
 # Fennel
 
-Authors:
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
+[![Documentation](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://meighenbergers.github.io/fennel/)
 
-1. Stephan Meighen-Berger, developed the Fennel Code
+A Python package for simulating Cherenkov light yields from particle tracks and cascades in ice or water. The v2 API adds structured results, validation, and convenience helpers while keeping the classic v1 tuple API fully supported.
 
 ## Table of contents
+- [What's New in v2.0.0](#whats-new-in-v200)
+- [Features](#features)
+- [Documentation](#documentation)
+- [Installation](#installation)
+- [Quickstart (v2 API)](#quickstart-v2-api)
+- [Testing](#testing)
+- [Development](#development)
+- [Citation](#citation)
+- [Support](#support)
+- [Beta projects](#beta-projects)
 
-1. [Introduction](#introduction)
+## What's New in v2.0.0
 
-2. [Citation](#citation)
+🎉 **Major release with backward-compatible API improvements!**
 
-3. [Documentation](#documentation)
+- **Structured Results**: New result container classes (`TrackYieldResult`, `EMYieldResult`, `HadronYieldResult`) with named attributes and pretty printing
+- **Convenience Methods**: One-line calculations with `quick_track()`, `quick_cascade()`, and `calculate()`
+- **Input Validation**: Comprehensive validation with helpful error messages via `ValidationError`
+- **Enhanced Documentation**: Complete MkDocs site with user guides, API reference, and examples
+- **100% Backward Compatible**: All v1.x methods continue to work identically
 
-4. [Installation](#installation)
+See the full [Changelog](CHANGELOG.md) and [Upgrade Guide](https://meighenbergers.github.io/fennel/getting-started/upgrade-guide/) for details.
 
-5. [Beta](#beta)
+> **Note**: The v2.0.0 release is currently only available via GitHub installation. PyPI still hosts v1.3.4.
 
-## Introduction <a name="introduction"></a>
+## Features
 
-Welcome to Fennel!
+### Physics Coverage
+- **Muon Tracks**: Energy loss mechanisms (ionization, bremsstrahlung, pair production) with wavelength-dependent yields
+- **EM Cascades**: Electron, positron, and photon-initiated showers with longitudinal profiles and angular distributions
+- **Hadron Cascades**: Pion, kaon, proton, and neutron showers with EM fraction tracking and muon production
+- **Validated Physics**: Reference values from GEANT4 simulations ensure accuracy
 
-![Logo](images/Fennel.png)
+### Technical Features
+- **High Performance**: NumPy-based calculations optimized for CPU efficiency
+- **GPU Acceleration**: Optional JAX backend for massive speedups on large batches
+- **User-Friendly API**: Intuitive interface with comprehensive type hints and documentation
+- **Flexible Configuration**: YAML or dictionary-based configuration system
+- **Wavelength Grids**: Customizable wavelength bins for spectral analysis
 
-A python package to simulate the light production of particles.
-It calculates the light emissions from cascades and tracks.
+## Documentation
 
-## Citation <a name="citation"></a>
+📚 **[Full Documentation Site](https://meighenbergers.github.io/fennel/)** (MkDocs)
 
-This packages includes/uses distributions developed in
+### Quick Links
+- **Getting Started**
+  - [Installation Guide](https://meighenbergers.github.io/fennel/getting-started/installation/) - PyPI, GitHub, and development setups
+  - [Quickstart Tutorial](https://meighenbergers.github.io/fennel/getting-started/quickstart/) - Your first calculations
+  - [Basic Examples](https://meighenbergers.github.io/fennel/getting-started/examples/) - Common use cases
 
-Leif Rädel, Christopher Wiebusch,\
-*Calculation of the Cherenkov light yield from low energetic secondary particles accompanying high-energy muons in ice and water with Geant4 simulations*,\
-Astroparticle Physics,
-Volume 38,
-2012,
-Pages 53-67,
-ISSN 0927-6505,\
-<https://doi.org/10.1016/j.astropartphys.2012.09.008.>
-(<https://www.sciencedirect.com/science/article/pii/S0927650512001831>)
+- **User Guides**
+  - [Configuration](https://meighenbergers.github.io/fennel/user-guide/configuration/) - YAML and dictionary setup
+  - [Muon Tracks](https://meighenbergers.github.io/fennel/user-guide/tracks/) - Track yield calculations
+  - [EM Cascades](https://meighenbergers.github.io/fennel/user-guide/em-cascades/) - Electromagnetic showers
+  - [Hadron Cascades](https://meighenbergers.github.io/fennel/user-guide/hadron-cascades/) - Hadronic showers
+  - [Advanced Usage](https://meighenbergers.github.io/fennel/user-guide/advanced/) - JAX, batching, and optimization
 
-and
+- **API Reference**
+  - [Fennel Core API](https://meighenbergers.github.io/fennel/api/fennel/) - Main interface
+  - [Results Containers](https://meighenbergers.github.io/fennel/api/results/) - v2 result objects
+  - [Configuration](https://meighenbergers.github.io/fennel/api/config/) - Config management
 
-<https://www.institut3b.physik.rwth-aachen.de/global/show_document.asp?id=aaaaaaaaaapwhjz>
+- **Development**
+  - [Contributor Guide](CONTRIBUTING.md) - How to contribute
+  - [PR Guide](https://meighenbergers.github.io/fennel/development/pr-guide/) - PR guidelines and workflow
+  - [Upgrade Guide](https://meighenbergers.github.io/fennel/getting-started/upgrade-guide/) - Migration from v1 to v2
+  - [Changelog](CHANGELOG.md) - Version history
 
-Please cite this [software](https://github.com/MeighenBergerS/fennel) using
+### Local Documentation
+- MkDocs sources: [docs-mkdocs/](docs-mkdocs/) directory
+- Build locally: `mkdocs serve` (see [docs-mkdocs/README.md](docs-mkdocs/README.md))
 
-```
-@software{fennel2022@github,
-  author = {Stephan Meighen-Berger},
-  title = {{Fennel}: Light from tracks and cascades,
-  url = {https://github.com/MeighenBergerS/fennel},
-  version = {2.0.0},
-  year = {2022},
-}
-```
+## Installation
 
-and their work when using this package.
+### ⚠️ Important: Version Differences
 
-## Documentation <a name="documentation"></a>
+**PyPI (v1.3.4)**: Stable release with classic tuple-based API  
+**GitHub (v2.0.0)**: Latest release with new structured API and convenience methods
 
-The package provides automatically generated documentation under
-<https://meighenbergers.github.io/fennel/>
+> **PyPI is currently on v1.3.4** and uses the classic tuple API. For the new v2.0.0 API with structured results, validation, and convenience methods, install from GitHub until the PyPI package is updated.
 
-## Installation <a name="installation"></a>
-
-Install using pip:
-
-```python
+### PyPI - Stable v1.3.4 (Classic API)
+```bash
 pip install fennel_seed
 ```
+This version uses tuple returns and is production-stable. Perfect if you need stability or have existing v1 code.
 
-[The PyPi webpage](https://pypi.org/project/fennel-seed/)
+### GitHub - Latest v2.0.0 (Recommended for New Projects)
 
-Note: The current pip (PyPI) release of `fennel_seed` is based on Fennel v1.3.4. The repository's `master` branch contains the newer v2 API; until a new release is published to PyPI, `pip install fennel_seed` reflects the v1.3.4 behavior and interfaces.
-
-### Install v2 (from source)
-
-To use the latest v2 API from this repository:
-
+**⭐ Recommended for new projects** - includes all v2 features while remaining 100% backward compatible.
 ```bash
-# Clone (or use your existing clone)
-git clone https://github.com/MeighenBergerS/fennel.git
-cd fennel
-
-# Create and activate a virtual environment (recommended)
-python3 -m venv .venv
-source .venv/bin/activate
-
-# Install the package from source
-pip install -e .
-
-# Optional extras (for notebooks/plots)
-pip install -e .[interactive]
-```
-
-### Install v2 (from GitHub)
-
-You can install directly from the repository without cloning:
-
-```bash
-# Latest master
+# Base install
 pip install "fennel_seed @ git+https://github.com/MeighenBergerS/fennel.git@master"
 
-# With optional interactive extras (notebooks/plots)
+# With JAX for GPU acceleration
+pip install "fennel_seed[jax] @ git+https://github.com/MeighenBergerS/fennel.git@master"
+
+# With interactive/notebook features
 pip install "fennel_seed[interactive] @ git+https://github.com/MeighenBergerS/fennel.git@master"
 ```
 
-Other installation methods:
-To install please clone the [repository](https://github.com/MeighenBergerS/fennel) or download the latest release. Then
-follow the instructions given in INSTALL.txt.
-Note this should install all necessary components.
+📖 **More installation options**: [Installation Guide](https://meighenbergers.github.io/fennel/getting-started/installation/)
 
-Or install using the setup.py
+### Development Install (From Source)
+```bash
+git clone https://github.com/MeighenBergerS/fennel.git
+cd fennel
+python3 -m venv .venv && source .venv/bin/activate
 
-Please note that JAX is not included in the basic installation.
-To use this option, please also install JAX or install fennel using:
+# Editable install
+pip install -e .
 
-```python
-pip install fennel_seed[jax]
+# With development tools (testing, docs, linting)
+pip install -e .[dev]
 ```
 
-For the cpu version of jax use:
-
-```python
-pip install fennel_seed[cpu]
+Verify installation:
+```bash
+python -c "import fennel; print(f'Fennel {fennel.__version__} ready!')"
 ```
 
-To be able to run the example notebook use:
+Quick functionality check:
+```python
+from fennel import Fennel
+f = Fennel()
+
+# v2 API
+result = f.quick_track(energy=100.0, interaction="total")
+print(f"Track result: {result.photons.sum():.2e} photons")
+
+# v1 API (still works)
+_, photons = f.track_yields(energy=100.0, particle=13)
+print(f"Legacy API: {photons.sum():.2e} photons")
+
+f.close()
+```
+
+## Quickstart (v2 API)
+
+### Basic Usage
 
 ```python
-pip install fennel_seed[interactive]
+from fennel import Fennel
+
+f = Fennel()
+
+# 🎯 Quick track calculation (100 GeV muon)
+track = f.quick_track(energy=100.0, interaction="total")
+print(f"Energy: {track.energy} GeV")
+print(f"Particle: {track.particle_name}")
+print(f"Total photons: {track.photons.sum():.2e}")
+print(f"Yield shape: {track.dcounts.shape}")
+
+# 🎯 Quick cascade (automatically detects EM vs hadron)
+cascade = f.quick_cascade(energy=1000.0, particle=11)  # electron
+print(f"Cascade from {cascade.particle_name}")
+print(f"Profile: {cascade.longitudinal_profile.shape}")
+
+# 🎯 Universal calculator (auto-detects everything)
+result = f.calculate(energy=500.0, particle=211)  # π+ (hadron)
+print(f"Type: {result.interaction}")
+if hasattr(result, 'em_fraction'):
+    print(f"EM fraction: {result.em_fraction:.2%}")
+
+f.close()
 ```
+
+### v2 Features
+
+```python
+# Structured results with named attributes
+track = f.track_yields_v2(energy=100.0, particle=13, interaction="total")
+print(track.wavelengths)  # Named attribute instead of tuple unpacking
+print(track.photons)
+print(track.dcounts)
+
+# Pretty printing
+print(track)  # Shows all contained data
+
+# Legacy v1 API (100% compatible)
+wavelengths, photons = f.track_yields(energy=100.0, particle=13)
+print(f"v1 API: {photons.sum():.2e} photons")
+```
+
+### More Examples
+- 📘 [Full Quickstart Tutorial](https://meighenbergers.github.io/fennel/getting-started/quickstart/)
+- 📓 [Example Notebooks](notebooks/) - `example_v2.ipynb`, `example.ipynb`
+- 📖 [User Guides](https://meighenbergers.github.io/fennel/user-guide/configuration/) - Detailed usage for each feature
+
+## Testing
+
+Fennel has comprehensive test coverage (123+ tests) covering API, validation, physics, and backward compatibility.
+
+```bash
+# Run all tests
+pytest tests/
+
+# Specific test suites
+pytest tests/test_v2_api.py              # v2 API features
+pytest tests/test_physics_regression.py  # Physics validation
+pytest tests/test_integration.py         # End-to-end tests
+
+# With coverage report
+pytest --cov=fennel tests/
+```
+
+See [TEST_SETUP_COMPLETE.md](TEST_SETUP_COMPLETE.md) for test infrastructure details.
 
 ## Development
 
-This repository uses pre-commit hooks to keep the codebase tidy and to ensure Jupyter notebooks are clean (no cell outputs) before committing.
+### Contributing
 
-### Pre-commit hooks
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
-- Formatting and linting (Black, isort, Flake8) run automatically.
-- Notebook outputs are stripped on commit via `nbstripout` for all `.ipynb` files.
+- How to set up your development environment
+- Code style and testing guidelines
+- Pull request process
+- Commit conventions
 
-Enable locally:
+Also see:
+- [Testing Guide](https://meighenbergers.github.io/fennel/development/testing/) - Running and writing tests
+- [PR Guide](https://meighenbergers.github.io/fennel/development/pr-guide/) - Pull request workflow
+- [Commit Guide](https://meighenbergers.github.io/fennel/development/commit-guide/) - Commit conventions
+
+### Pre-commit Hooks
+
+This repository uses pre-commit hooks for code quality and notebook cleanliness.
 
 ```bash
+# Install hooks
 pip install pre-commit
 pre-commit install
 
-# Optional: run on the entire repo immediately
+# Run on all files
 pre-commit run --all-files
 
-# Only strip notebook outputs across the repo
-pre-commit run nbstripout --all-files
+# Specific hooks
+pre-commit run nbstripout --all-files  # Clean notebook outputs
 ```
 
-### Pull requests
+### Documentation
 
-See [docs-mkdocs/development/pr-guide.md](docs-mkdocs/development/pr-guide.md) for the branching, testing, and review checklist.
+Build and serve documentation locally:
 
-## Beta <a name="beta"></a>
+```bash
+# Install MkDocs
+pip install -r docs-mkdocs/requirements.txt
 
-Fennel offers a few subprojects which are currently still in beta. While these projects work, they have as of yet not been designed for usability. Currently available subprojects are available offer the GitHub repository (not pip!). Subprojects are:
+# Serve locally (with live reload)
+mkdocs serve
 
-1. Jfennel: A Julia implementation of Fennel. This is its own branch in the repository and still requires further work and cross-checks.
+# Build static site
+mkdocs build
+```
 
-2. Seed: An interface to the Geant4 code used for the parametrization. The code itself offers a Python interface for ease of use. To use this code, a Geant4 installation is required. Currently this module has only been tested in a Linux environment. The code itself is contained in the seed folder and includes some examples in the notebooks folder on how to use it. Please note the codes there work for Geant4 version 1.10. Version 1.11 breaks compability with of some of the provided codes.
+Documentation source: [docs-mkdocs/](docs-mkdocs/)
+
+## Citation
+
+If you use Fennel in your research, please cite:
+
+### Software Citation
+
+```bibtex
+@software{fennel2024,
+  author = {Meighen-Berger, Stephan},
+  title = {Fennel: Cherenkov Light Yield Simulation},
+  url = {https://github.com/MeighenBergerS/fennel},
+  version = {2.0.0},
+  year = {2024}
+}
+```
+
+### Parametrization References
+
+Fennel uses the Aachen parametrization based on GEANT4 simulations. Please also cite:
+
+**Rädel, L., & Wiebusch, C.** (2012). *Calculation of the Cherenkov light yield from low energetic secondary particles accompanying high-energy muons in ice and water with Geant4 simulations*. Astroparticle Physics, 38, 53-67. [doi:10.1016/j.astropartphys.2012.09.008](https://doi.org/10.1016/j.astropartphys.2012.09.008)
+
+Additional references: [Citation Guide](https://meighenbergers.github.io/fennel/about/citation/)
+
+## Support
+
+- **📖 Documentation**: [https://meighenbergers.github.io/fennel/](https://meighenbergers.github.io/fennel/)
+- **🐛 Bug Reports**: [GitHub Issues](https://github.com/MeighenBergerS/fennel/issues)
+- **💬 Discussions**: [GitHub Discussions](https://github.com/MeighenBergerS/fennel/discussions)
+- **📧 Contact**: Open an issue or discussion for questions
+
+### Troubleshooting
+
+Common issues and solutions:
+
+- **Import errors**: Ensure you have Python 3.8+ and all dependencies installed
+- **Version confusion**: Check `fennel.__version__` to verify which version you have
+- **JAX issues**: JAX is optional; install with `pip install fennel_seed[jax]`
+- **Validation errors**: v2 API provides detailed error messages - read them carefully!
+
+For more help, see the [documentation](https://meighenbergers.github.io/fennel/) or open an issue.
+
+## Beta Projects
+
+Fennel includes experimental subprojects available in the repository:
+
+### Seed (GEANT4 Interface)
+
+A GEANT4-based interface for generating and validating parametrizations.
+
+- **Location**: [seed/](seed/) directory
+- **Requirements**: GEANT4 installation (tested on Linux)
+- **Documentation**: See [seed/README.md](seed/README.md)
+- **Examples**: Included in [seed/examples/](seed/examples/)
+
+⚠️ **Beta Status**: This component is experimental and primarily for advanced users interested in parametrization development.
+
+---
+
+**License**: MIT - See [LICENSE.txt](LICENSE.txt) for details

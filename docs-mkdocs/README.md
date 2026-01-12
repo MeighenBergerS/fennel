@@ -91,13 +91,23 @@ This documentation uses:
 - **Search** - Built-in search functionality
 - **Dark mode** - Automatic dark/light theme switching
 
-## Transition Plan
+## Official Documentation
 
-This is the new documentation being developed alongside the existing Sphinx docs (in `docs/`). Once it's complete and stable, it will replace the Sphinx documentation.
+This is the **official documentation** for Fennel, automatically deployed to GitHub Pages.
+
+### Deployment
+
+- **URL**: https://meighenbergers.github.io/fennel/
+- **Auto-deploy**: GitHub Actions deploys on every push to `master`
+- **Workflow**: `.github/workflows/deploy-docs.yml`
+
+### Previous Documentation
+
+The old Sphinx-based documentation in `docs/` has been deprecated. See `docs/DEPRECATED.md` for details.
 
 ### Current Status
 
-- ✅ Basic structure
+- ✅ Complete structure and content
 - ✅ Auto-generated API docs
 - ✅ Installation and quickstart
 - ⏳ User guides (in progress)
