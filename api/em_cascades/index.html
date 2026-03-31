@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -1533,13 +1533,7 @@ based on JAX availability.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>fennel/em_cascades.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-76"> 76</a></span>
-<span class="normal"><a href="#__codelineno-0-77"> 77</a></span>
-<span class="normal"><a href="#__codelineno-0-78"> 78</a></span>
-<span class="normal"><a href="#__codelineno-0-79"> 79</a></span>
-<span class="normal"><a href="#__codelineno-0-80"> 80</a></span>
-<span class="normal"><a href="#__codelineno-0-81"> 81</a></span>
-<span class="normal"><a href="#__codelineno-0-82"> 82</a></span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-82"> 82</a></span>
 <span class="normal"><a href="#__codelineno-0-83"> 83</a></span>
 <span class="normal"><a href="#__codelineno-0-84"> 84</a></span>
 <span class="normal"><a href="#__codelineno-0-85"> 85</a></span>
@@ -1575,49 +1569,55 @@ based on JAX availability.</p>
 <span class="normal"><a href="#__codelineno-0-115">115</a></span>
 <span class="normal"><a href="#__codelineno-0-116">116</a></span>
 <span class="normal"><a href="#__codelineno-0-117">117</a></span>
-<span class="normal"><a href="#__codelineno-0-118">118</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    Initialize the EM cascade calculator.</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    Loads parametrization data and configures calculation methods</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    based on JAX availability.</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    Raises</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    ------</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">    ValueError</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">        If parametrization is not implemented</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    ImportError</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">        If JAX mode enabled but not installed</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;enable logging&quot;</span><span class="p">]:</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a>        <span class="n">_log</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a>    <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Constructing an em cascade object&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_medium</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;mediums&quot;</span><span class="p">][</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;scenario&quot;</span><span class="p">][</span><span class="s2">&quot;medium&quot;</span><span class="p">]]</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_medium</span><span class="p">[</span><span class="s2">&quot;refractive index&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_radlength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_medium</span><span class="p">[</span><span class="s2">&quot;radiation length&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_Lrad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radlength</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_medium</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a>    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;scenario&quot;</span><span class="p">][</span><span class="s2">&quot;parametrization&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;aachen&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a>        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading the aachen parametrization&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-99" name="__codelineno-0-99"></a>        <span class="n">param_file</span> <span class="o">=</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a>            <span class="vm">__name__</span><span class="p">,</span> <span class="s2">&quot;data/</span><span class="si">%s</span><span class="s2">.pkl&quot;</span> <span class="o">%</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;scenario&quot;</span><span class="p">][</span><span class="s2">&quot;parametrization&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a>        <span class="p">)</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">param_file</span><span class="p">)[</span><span class="s2">&quot;em cascade&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-104" name="__codelineno-0-104"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>            <span class="s2">&quot;EM parametrization &quot;</span>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a>            <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;scenario&quot;</span><span class="p">][</span><span class="s2">&quot;parametrization&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-107" name="__codelineno-0-107"></a>            <span class="o">+</span> <span class="s2">&quot; not implemented!&quot;</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a>        <span class="p">)</span>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a>    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;jax&quot;</span><span class="p">]:</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a>        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running with JAX functions&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cherenkov_angle_distro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric_angle_distro_jax</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">track_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_track_lengths_fetcher_jax</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">long_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_profile_func_fetcher_jax</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-115" name="__codelineno-0-115"></a>        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running with basic functions&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cherenkov_angle_distro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric_angle_distro</span>
-<a id="__codelineno-0-117" name="__codelineno-0-117"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">track_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_track_lengths_fetcher</span>
-<a id="__codelineno-0-118" name="__codelineno-0-118"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">long_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_profile_func_fetcher</span>
+<span class="normal"><a href="#__codelineno-0-118">118</a></span>
+<span class="normal"><a href="#__codelineno-0-119">119</a></span>
+<span class="normal"><a href="#__codelineno-0-120">120</a></span>
+<span class="normal"><a href="#__codelineno-0-121">121</a></span>
+<span class="normal"><a href="#__codelineno-0-122">122</a></span>
+<span class="normal"><a href="#__codelineno-0-123">123</a></span>
+<span class="normal"><a href="#__codelineno-0-124">124</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    Initialize the EM cascade calculator.</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    Loads parametrization data and configures calculation methods</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    based on JAX availability.</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    Raises</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    ------</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    ValueError</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        If parametrization is not implemented</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    ImportError</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        If JAX mode enabled but not installed</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;enable logging&quot;</span><span class="p">]:</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>        <span class="n">_log</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a>    <span class="n">_log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Constructing an em cascade object&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_medium</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;mediums&quot;</span><span class="p">][</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;scenario&quot;</span><span class="p">][</span><span class="s2">&quot;medium&quot;</span><span class="p">]]</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_medium</span><span class="p">[</span><span class="s2">&quot;refractive index&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_radlength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_medium</span><span class="p">[</span><span class="s2">&quot;radiation length&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_Lrad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radlength</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_medium</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;scenario&quot;</span><span class="p">][</span><span class="s2">&quot;parametrization&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;aachen&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-104" name="__codelineno-0-104"></a>        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading the aachen parametrization&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="n">param_file</span> <span class="o">=</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+<a id="__codelineno-0-106" name="__codelineno-0-106"></a>            <span class="vm">__name__</span><span class="p">,</span> <span class="s2">&quot;data/</span><span class="si">%s</span><span class="s2">.pkl&quot;</span> <span class="o">%</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;scenario&quot;</span><span class="p">][</span><span class="s2">&quot;parametrization&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-107" name="__codelineno-0-107"></a>        <span class="p">)</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">param_file</span><span class="p">)[</span><span class="s2">&quot;em cascade&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a>            <span class="s2">&quot;EM parametrization &quot;</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a>            <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;scenario&quot;</span><span class="p">][</span><span class="s2">&quot;parametrization&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a>            <span class="o">+</span> <span class="s2">&quot; not implemented!&quot;</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a>        <span class="p">)</span>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a>    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;jax&quot;</span><span class="p">]:</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a>        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running with JAX functions&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-117" name="__codelineno-0-117"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cherenkov_angle_distro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric_angle_distro_jax</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">track_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_track_lengths_fetcher_jax</span>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">long_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_profile_func_fetcher_jax</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-121" name="__codelineno-0-121"></a>        <span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running with basic functions&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cherenkov_angle_distro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric_angle_distro</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">track_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_track_lengths_fetcher</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">long_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_profile_func_fetcher</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
