@@ -18,8 +18,14 @@ from .config import config
 
 # Checking if JAX should be used
 try:
+    import jax as _jax
     import jax.numpy as jnp
     from jax import Array as JaxArray
+
+    try:
+        _jax.config.update("jax_enable_x64", True)
+    except Exception:
+        pass
 except ImportError:
     jnp = None
     JaxArray = None

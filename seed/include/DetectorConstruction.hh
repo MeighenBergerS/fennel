@@ -25,7 +25,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     // Set methods
     void SetTargetMaterial (G4String );
     const G4VPhysicalVolume* GetTargetPV() const;
-    
+
   private:
     // methods
     //
@@ -40,12 +40,11 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 
 // inline functions
 
-inline const G4VPhysicalVolume* DetectorConstruction::GetTargetPV() const { 
-  return fTargetPV; 
+inline const G4VPhysicalVolume* DetectorConstruction::GetTargetPV() const {
+  return fTargetPV;
 }
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-

@@ -10,7 +10,7 @@ class DetectorConstruction;
 class EventAction;
 
 /// Stepping action class
-/// 
+///
 
 class SteppingAction : public G4UserSteppingAction
 {

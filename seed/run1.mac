@@ -1,9 +1,9 @@
 # Macro file for example showers
-# 
+#
 # Can be run in batch, without graphic
 # or interactively: Idle> /control/execute run1.mac
 #
-# Change the default number of workers (in multi-threading mode) 
+# Change the default number of workers (in multi-threading mode)
 /run/numberOfThreads 4
 #
 # Initialize kernel
@@ -14,7 +14,7 @@
 #
 # set cut in run
 /run/setCut 0.1 cm
-# 
+#
 # The events
 #
 /gun/particle proton

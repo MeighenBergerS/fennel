@@ -41,7 +41,7 @@ void ActionInitialization::Build() const
   auto eventAction = new EventAction;
   SetUserAction(eventAction);
   SetUserAction(new SteppingAction(fDetConstruction, eventAction));
-}  
+}
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

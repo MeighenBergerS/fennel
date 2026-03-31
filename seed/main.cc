@@ -54,8 +54,8 @@ int main(int argc,char** argv)
       PrintUsage();
       return 1;
     }
-  }  
-  
+  }
+
   // Detect interactive mode (if no macro provided) and define UI session
   //
   G4UIExecutive* ui = nullptr;
@@ -66,15 +66,15 @@ int main(int argc,char** argv)
   // Optionally: choose a different Random engine...
   //
   // G4Random::setTheEngine(new CLHEP::MTwistEngine);
-  
+
   // Construct the default run manager
   //
   auto* runManager =
     G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
   #ifdef G4MULTITHREADED
-    if ( nThreads > 0 ) { 
+    if ( nThreads > 0 ) {
       runManager->SetNumberOfThreads(nThreads);
-    }  
+    }
   #endif
 
   // Set mandatory initialization classes
@@ -84,10 +84,10 @@ int main(int argc,char** argv)
 
   auto physicsList = new SMBPhysics;
   runManager->SetUserInitialization(physicsList);
-    
+
   auto actionInitialization = new ActionInitialization(detConstruction);
   runManager->SetUserInitialization(actionInitialization);
-  
+
   // Initialize visualization
   //
   auto visManager = new G4VisExecutive;
@@ -105,7 +105,7 @@ int main(int argc,char** argv)
     G4String command = "/control/execute ";
     UImanager->ApplyCommand(command+macro);
   }
-  else  {  
+  else  {
     // interactive mode : define UI session
     UImanager->ApplyCommand("/control/execute init_vis.mac");
     if (ui->IsGUI()) {
@@ -117,7 +117,7 @@ int main(int argc,char** argv)
 
   // Job termination
   // Free the store: user actions, physics_list and detector_description are
-  // owned and deleted by the run manager, so they should not be deleted 
+  // owned and deleted by the run manager, so they should not be deleted
   // in the main() program !
 
   delete visManager;

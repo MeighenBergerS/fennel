@@ -3,7 +3,7 @@
 
 #include "SMBPhysics.hh"
 
-#include <iomanip>   
+#include <iomanip>
 #include <CLHEP/Units/SystemOfUnits.h>
 
 #include "globals.hh"
@@ -31,7 +31,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-SMBPhysics::SMBPhysics() 
+SMBPhysics::SMBPhysics()
 : G4VModularPhysicsList(){
   SetVerboseLevel(1);
 
@@ -59,7 +59,7 @@ SMBPhysics::SMBPhysics()
 
   // Ion Physics
   RegisterPhysics( new G4IonPhysics());
-  
+
   // Neutron tracking cut
   RegisterPhysics( new G4NeutronTrackingCut());
 
@@ -71,7 +71,7 @@ SMBPhysics::SMBPhysics()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 SMBPhysics::~SMBPhysics()
-{ 
+{
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -92,4 +92,4 @@ void SMBPhysics::SetCuts()
   G4VUserPhysicsList::SetCuts();
 
   DumpCutValuesTable();
-}  
+}

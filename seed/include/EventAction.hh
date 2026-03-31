@@ -25,18 +25,18 @@ class EventAction : public G4UserEventAction
 
     virtual void  BeginOfEventAction(const G4Event* event);
     virtual void    EndOfEventAction(const G4Event* event);
-    
+
     void AddTarget(G4double de, G4double dl);
-    
+
   private:
     G4double  fEnergyTarget;
-    G4double  fTrackLTarget; 
+    G4double  fTrackLTarget;
 };
 
 // inline functions
 
 inline void EventAction::AddTarget(G4double de, G4double dl) {
-  fEnergyTarget += de; 
+  fEnergyTarget += de;
   fTrackLTarget += dl;
 }
 
@@ -44,5 +44,3 @@ inline void EventAction::AddTarget(G4double de, G4double dl) {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-
-    

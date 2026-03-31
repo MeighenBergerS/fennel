@@ -21,9 +21,15 @@ from .config import config
 from .particle import Particle
 
 try:
+    import jax as _jax
     import jax.numpy as jnp
     from jax import Array as JaxArray
     from jax.scipy.stats import gamma as jax_gamma
+
+    try:
+        _jax.config.update("jax_enable_x64", True)
+    except Exception:
+        pass
 except ImportError:
     jnp = None
     jax_gamma = None

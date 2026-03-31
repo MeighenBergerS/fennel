@@ -14,15 +14,15 @@
 
 RunAction::RunAction()
 : G4UserRunAction()
-{ 
+{
   // set printing event number per each event
-  G4RunManager::GetRunManager()->SetPrintProgress(1);  
+  G4RunManager::GetRunManager()->SetPrintProgress(1);
   // Create analysis manager
   // The choice of analysis technology is done via selectin of a namespace
   // in B4Analysis.hh
   auto analysisManager = G4AnalysisManager::Instance();
   G4cout << "Using " << analysisManager->GetType() << G4endl;
-  // Create directories 
+  // Create directories
   //analysisManager->SetHistoDirectoryName("histograms");
   //analysisManager->SetNtupleDirectoryName("ntuple");
   analysisManager->SetVerboseLevel(1);
@@ -65,13 +65,13 @@ RunAction::RunAction()
 
 RunAction::~RunAction()
 {
-  delete G4AnalysisManager::Instance();  
+  delete G4AnalysisManager::Instance();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void RunAction::BeginOfRunAction(const G4Run*)
-{ 
+{
   // inform the runManager to save random number seed
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
 
@@ -95,20 +95,20 @@ void RunAction::EndOfRunAction(const G4Run* run)
   if ( analysisManager->GetH1(1) ) {
     G4cout << G4endl << " ----> print histograms statistic ";
     if(isMaster) {
-      G4cout << "for the entire run " << G4endl << G4endl; 
+      G4cout << "for the entire run " << G4endl << G4endl;
     }
     else {
-      G4cout << "for the local thread " << G4endl << G4endl; 
+      G4cout << "for the local thread " << G4endl << G4endl;
     }
-    
-    G4cout << " ETarget : mean = " 
-       << G4BestUnit(analysisManager->GetH1(0)->mean(), "Energy") 
-       << " rms = " 
+
+    G4cout << " ETarget : mean = "
+       << G4BestUnit(analysisManager->GetH1(0)->mean(), "Energy")
+       << " rms = "
        << G4BestUnit(analysisManager->GetH1(0)->rms(),  "Energy") << G4endl;
 
-    G4cout << " LTarget : mean = " 
-      << G4BestUnit(analysisManager->GetH1(1)->mean(), "Length") 
-      << " rms = " 
+    G4cout << " LTarget : mean = "
+      << G4BestUnit(analysisManager->GetH1(1)->mean(), "Length")
+      << " rms = "
       << G4BestUnit(analysisManager->GetH1(1)->rms(),  "Length") << G4endl;
   }
   // save histograms & ntuple
@@ -118,4 +118,3 @@ void RunAction::EndOfRunAction(const G4Run* run)
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
